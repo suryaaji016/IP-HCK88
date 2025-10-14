@@ -1,16 +1,55 @@
-// =======================================================
-// 🎵 MUSIC APP SERVER (Gemini AI + Spotify Integration)
-// =======================================================
 require("dotenv").config();
+const { User, Playlist, MusicList } = require("./models");
+const { comparePassword } = require("./helpers/bcrypt");
+const { signToken, verifyToken } = require("./helpers/jwt");
+const authentication = require("./middlewares/authentication");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3001;
+
+app.post("/register", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ message: "Email & password wajib diisi" });
+
+    const existing = await User.findOne({ where: { email } });
+    if (existing)
+      return res.status(400).json({ message: "Email sudah digunakan" });
+
+    const user = await User.create({ email, password });
+    res.status(201).json({ id: user.id, email: user.email });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Login
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user || !comparePassword(password, user.password))
+      return res.status(401).json({ message: "Email atau password salah" });
+
+    const access_token = signToken({ id: user.id });
+    res.json({ access_token });
+  } catch (err) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// =======================================================
+// 🧱 Middleware Authentication (JWT)
+// =======================================================
+app.use(authentication);
 
 // =======================================================
 // 🔑 Ambil Token Spotify
@@ -38,42 +77,61 @@ async function getSpotifyToken() {
 // =======================================================
 async function analyzeMood(prompt) {
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log(
+      "🔑 GEMINI API KEY:",
+      process.env.GEMINI_API_KEY ? "ADA" : "TIDAK ADA"
+    );
 
-    const result = await model.generateContent(`
+    // 🔹 Default prompt jika user tidak mengisi apa pun
+    const userPrompt =
+      prompt?.trim() ||
+      "Saya tidak menulis apa pun, tolong tentukan suasana hati umum dan genre musik yang cocok.";
+
+    // 🔹 Buat instance Gemini AI
+    const ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+    });
+
+    // 🔹 Prompt utama untuk AI
+    const detailedPrompt = `
       Analisis kalimat berikut dan tentukan suasana hati serta genre musik yang cocok:
-      "${prompt}"
-      Jawab hanya dalam format JSON:
+      "${userPrompt}"
+
+      Berikan jawaban dalam format JSON seperti contoh:
       {"mood":"sedih dan galau","genre":"romance"}
+
+      Panduan pemetaan suasana hati:
       - Jika marah → rock
       - Jika galau/sedih → romance
       - Jika belajar/fokus → study
       - Jika santai/tenang → chill
       - Jika semangat → pop
       - Jika tidur → sleep
-    `);
+      - Jika tidak jelas → netral dan genre pop
+    `;
 
-    const raw = result.response
-      .text()
-      .replace(/```json|```/g, "")
-      .trim();
-    const parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)[0]);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: detailedPrompt,
+    });
+
+    // 🔹 Ambil hasil teks dari AI
+    const text =
+      (response.text || response.response?.text?.())?.toString() || "";
+    const clean = text.replace(/```json|```/g, "").trim();
+
+    // 🔹 Ambil hanya JSON-nya
+    const match = clean.match(/\{[\s\S]*\}/);
+    const parsed = match
+      ? JSON.parse(match[0])
+      : { mood: "netral", genre: "pop" };
+
+    console.log("✅ Gemini result:", parsed);
     return parsed;
   } catch (err) {
     console.error("⚠️ Gemini gagal:", err.message);
-    const lower = prompt.toLowerCase();
-    if (lower.includes("marah")) return { mood: "marah", genre: "rock" };
-    if (lower.includes("galau") || lower.includes("sedih"))
-      return { mood: "galau", genre: "romance" };
-    if (lower.includes("belajar") || lower.includes("fokus"))
-      return { mood: "fokus belajar", genre: "study" };
-    if (lower.includes("santai") || lower.includes("tenang"))
-      return { mood: "santai", genre: "chill" };
-    if (lower.includes("tidur")) return { mood: "tenang", genre: "sleep" };
-    if (lower.includes("senang") || lower.includes("bahagia"))
-      return { mood: "ceria", genre: "pop" };
-    return { mood: "netral", genre: "pop" };
+
+    const lower = (prompt || "").toLowerCase();
   }
 }
 
@@ -172,6 +230,83 @@ app.get("/api/detail/:id", async (req, res) => {
   } catch (err) {
     console.error("❌ Error /api/detail:", err.message);
     res.status(404).json({ message: "Track not found" });
+  }
+});
+
+app.get("/api/playlists", async (req, res) => {
+  try {
+    const playlists = await Playlist.findAll({
+      where: { UserId: req.user.id },
+      include: MusicList,
+    });
+    res.json(playlists);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post("/api/playlists", async (req, res) => {
+  try {
+    const { name } = req.body;
+    const playlist = await Playlist.create({ name, UserId: req.user.id });
+    res.status(201).json(playlist);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+app.delete("/api/playlists/:id", async (req, res) => {
+  try {
+    const playlist = await Playlist.findOne({
+      where: { id: req.params.id, UserId: req.user.id },
+    });
+    if (!playlist)
+      return res.status(404).json({ message: "Playlist not found" });
+
+    await playlist.destroy();
+    res.json({ message: "Playlist deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// =======================================================
+// 🎶 MUSICLIST CRUD (Lagu per Playlist)
+// =======================================================
+app.post("/api/playlists/:id/music", async (req, res) => {
+  try {
+    const { spotifyId, name, artist, album, image, spotify_url } = req.body;
+
+    const playlist = await Playlist.findOne({
+      where: { id: req.params.id, UserId: req.user.id },
+    });
+    if (!playlist)
+      return res.status(404).json({ message: "Playlist not found" });
+
+    const music = await MusicList.create({
+      PlaylistId: playlist.id,
+      spotifyId,
+      name,
+      artist,
+      album,
+      image,
+      spotify_url,
+    });
+    res.status(201).json(music);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.delete("/api/playlists/:id/music/:musicId", async (req, res) => {
+  try {
+    const music = await MusicList.findByPk(req.params.musicId);
+    if (!music) return res.status(404).json({ message: "Music not found" });
+
+    await music.destroy();
+    res.json({ message: "Music deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
