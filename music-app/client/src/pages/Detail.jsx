@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import axios from "axios";
 
 export default function Detail() {
@@ -29,6 +29,9 @@ export default function Detail() {
 
   return (
     <div style={{ padding: "40px", maxWidth: "600px", margin: "0 auto" }}>
+      <button>
+        <Link to="/">Back to Home</Link>
+      </button>
       <img
         src={track.image}
         alt={track.name}

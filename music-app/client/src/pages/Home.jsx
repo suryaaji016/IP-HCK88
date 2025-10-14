@@ -131,7 +131,7 @@ export default function Home() {
   // =====================================================
   return (
     <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center" }}>🎧 Music Recommender</h1>
+      <h1 style={{ textAlign: "center" }}> Music Recommender</h1>
 
       {/* ========================= */}
       {/* 🤖 AI Mood Analyzer */}
@@ -147,7 +147,7 @@ export default function Home() {
         }}
       >
         <h2>
-          AI Mood Analyzer <span>🧠</span>
+          AI Mood Analyzer <span></span>
         </h2>
         <p>
           Tulis suasana hati kamu, lalu biarkan AI memilih lagu yang cocok
@@ -157,7 +157,7 @@ export default function Home() {
         <div style={{ display: "flex", gap: 10 }}>
           <input
             type="text"
-            placeholder="contoh: galau malam hujan 🌧️"
+            placeholder="contoh: galau malam hujan"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             style={{ flex: 1, padding: 10 }}
@@ -204,9 +204,7 @@ export default function Home() {
       {/* ========================= */}
       {/* 🔄 Lagu Random + Infinite Scroll */}
       {/* ========================= */}
-      <h2 style={{ marginTop: 40, textAlign: "center" }}>
-        🎲 Lagu Random Hari Ini
-      </h2>
+      <h2 style={{ marginTop: 40, textAlign: "center" }}>Lagu</h2>
       <div
         style={{
           display: "grid",
