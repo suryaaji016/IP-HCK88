@@ -24,22 +24,20 @@ export default function Detail() {
     }
   }
 
-  if (loading) return <p style={{ textAlign: "center" }}>⏳ Loading...</p>;
-  if (!track) return <p style={{ textAlign: "center" }}>⚠️ Track not found.</p>;
+  if (loading) return <p className="loading-message">⏳ Loading...</p>;
+  if (!track) return <p className="status-message">⚠️ Track not found.</p>;
 
   return (
-    <div style={{ padding: "40px", maxWidth: "600px", margin: "0 auto" }}>
-      <button>
-        <Link to="/">Back to Home</Link>
-      </button>
-      <img
-        src={track.image}
-        alt={track.name}
-        style={{ width: "100%", borderRadius: "12px" }}
-      />
-      <h2 style={{ marginTop: "20px" }}>{track.name}</h2>
-      <p style={{ color: "#444" }}>{track.artist}</p>
-      <p style={{ fontStyle: "italic" }}>Album: {track.album}</p>
+    <div className="detail-container">
+      <Link to="/" className="detail-back-button">
+        ← Back to Home
+      </Link>
+
+      <img src={track.image} alt={track.name} className="detail-image" />
+
+      <h2 className="detail-title">{track.name}</h2>
+      <p className="detail-artist">{track.artist}</p>
+      <p className="detail-album">Album: {track.album}</p>
 
       <button
         onClick={() => {
@@ -50,16 +48,7 @@ export default function Detail() {
             alert("Link Spotify tidak tersedia untuk lagu ini.");
           }
         }}
-        style={{
-          marginTop: "15px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          borderRadius: "8px",
-          background: "#1db954",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
+        className="detail-play-button"
       >
         🎵 Play on Spotify
       </button>

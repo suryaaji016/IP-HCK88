@@ -86,39 +86,13 @@ export default function Home() {
   // =====================================================
   function TrackCard({ track }) {
     return (
-      <div
-        key={track.id}
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: 10,
-          padding: 10,
-          background: "#fff",
-          textAlign: "center",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        }}
-      >
-        <img
-          src={track.image}
-          alt={track.name}
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            height: 200,
-            objectFit: "cover",
-          }}
-        />
-        <h4 style={{ marginTop: 8 }}>{track.name}</h4>
-        <p style={{ fontSize: 13, color: "#666" }}>{track.artist}</p>
+      <div className="track-card" key={track.id}>
+        <img src={track.image} alt={track.name} className="track-image" />
+        <h4 className="track-name">{track.name}</h4>
+        <p className="track-artist">{track.artist}</p>
         <button
           onClick={() => navigate(`/detail/${track.id}`)}
-          style={{
-            background: "#1db954",
-            color: "white",
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: "none",
-            cursor: "pointer",
-          }}
+          className="track-button"
         >
           Detail
         </button>
@@ -130,69 +104,47 @@ export default function Home() {
   // 🖼️ UI Rendering
   // =====================================================
   return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center" }}> Music Recommender</h1>
+    <div className="home-container">
+      <h1 className="home-title">🎵 Music Recommender</h1>
 
       {/* ========================= */}
       {/* 🤖 AI Mood Analyzer */}
       {/* ========================= */}
-      <section
-        style={{
-          maxWidth: 900,
-          margin: "0 auto",
-          background: "#f9f9f9",
-          border: "1px solid #ddd",
-          padding: 20,
-          borderRadius: 12,
-        }}
-      >
-        <h2>
-          AI Mood Analyzer <span></span>
-        </h2>
-        <p>
-          Tulis suasana hati kamu, lalu biarkan AI memilih lagu yang cocok
-          untukmu!
-        </p>
+      <section className="ai-section">
+        <div className="ai-header">
+          <h2 className="ai-title">🤖 AI Mood Analyzer</h2>
+          <p className="ai-description">
+            Tulis suasana hati kamu, lalu biarkan AI memilih lagu yang cocok
+            untukmu!
+          </p>
+        </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="ai-input-group">
           <input
             type="text"
-            placeholder="contoh: galau malam hujan"
+            placeholder="contoh: galau malam hujan 🌧️"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
-            style={{ flex: 1, padding: 10 }}
+            className="ai-input"
           />
           <button
             onClick={generateAIPlaylist}
             disabled={aiLoading}
-            style={{
-              background: "#1db954",
-              color: "white",
-              padding: "10px 16px",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
+            className="ai-button"
           >
-            {aiLoading ? "Analisis..." : "Generate 🎶"}
+            {aiLoading ? "⏳ Analisis..." : "Generate 🎶"}
           </button>
         </div>
 
         {aiData && (
-          <div style={{ marginTop: 20 }}>
-            <h3>
+          <div className="ai-results">
+            <h3 className="ai-results-header">
               ✨ Mood: {aiData.mood} | Genre: {aiData.genre}
             </h3>
-            <p style={{ color: "#666" }}>
-              🎧 5 Lagu terbaik untuk suasana hati kamu.
+            <p className="ai-results-subtitle">
+              🎧 5 Lagu terbaik untuk suasana hati kamu
             </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: 16,
-              }}
-            >
+            <div className="track-grid">
               {aiData.tracks.map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
@@ -204,28 +156,15 @@ export default function Home() {
       {/* ========================= */}
       {/* 🔄 Lagu Random + Infinite Scroll */}
       {/* ========================= */}
-      <h2 style={{ marginTop: 40, textAlign: "center" }}>Lagu</h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: 20,
-          marginTop: 10,
-        }}
-      >
+      <h2 className="section-title">🎸 Discover Music</h2>
+      <div className="track-grid">
         {tracks.map((track) => (
           <TrackCard key={track.id} track={track} />
         ))}
       </div>
 
-      {loading && (
-        <p style={{ textAlign: "center", marginTop: 20 }}>⏳ Memuat lagu...</p>
-      )}
-      {!hasMore && (
-        <p style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
-          ✅ Semua lagu telah dimuat.
-        </p>
-      )}
+      {loading && <p className="loading-message">⏳ Memuat lagu...</p>}
+      {!hasMore && <p className="status-message">✅ Semua lagu telah dimuat</p>}
     </div>
   );
 }
