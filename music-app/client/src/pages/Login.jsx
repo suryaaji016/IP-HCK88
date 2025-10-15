@@ -17,6 +17,11 @@ export default function Login() {
         password,
       });
       localStorage.setItem("access_token", data.access_token);
+      console.log(
+        "🔑 Token setelah login:",
+        localStorage.getItem("access_token")
+      );
+
       navigate("/");
     } catch (err) {
       alert(err.response?.data?.message || "Login gagal");
@@ -27,6 +32,10 @@ export default function Login() {
 
   const handleCredentialResponse = useCallback(
     async (response) => {
+      console.log(
+        "✅ Google credential:",
+        response.credential.slice(0, 30) + "..."
+      );
       try {
         const { data } = await axios.post(
           "http://localhost:3001/login/google",

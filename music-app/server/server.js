@@ -51,6 +51,8 @@ app.post("/login", async (req, res) => {
 
 app.post("/login/google", async (req, res) => {
   const { id_token } = req.body;
+  console.log("📨 /login/google terpanggil!");
+  console.log("🧩 id_token diterima dari frontend:", !!id_token);
   try {
     // Verifikasi token dari frontend
     const ticket = await client.verifyIdToken({
@@ -71,6 +73,9 @@ app.post("/login/google", async (req, res) => {
 
     // Buat token JWT lokal
     const access_token = signToken({ id: user.id });
+    console.log("✅ Google login user:", email);
+    console.log("🎟️ id_token diterima:", !!id_token);
+    console.log("📨 access_token dikirim:", access_token);
 
     res.status(created ? 201 : 200).json({
       message: "Login Google sukses",
@@ -380,10 +385,24 @@ app.get("/api/playlists", async (req, res) => {
 
 app.post("/api/playlists", async (req, res) => {
   try {
+    console.log("📝 POST /api/playlists called");
+    console.log("📦 Request body:", req.body);
+    console.log("👤 User from token:", req.user);
+
     const { name } = req.body;
+
+    if (!name || !name.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Nama playlist tidak boleh kosong" });
+    }
+
     const playlist = await Playlist.create({ name, UserId: req.user.id });
+    console.log("✅ Playlist created:", playlist.id);
+
     res.status(201).json(playlist);
   } catch (err) {
+    console.error("❌ Error creating playlist:", err);
     res.status(400).json({ message: err.message });
   }
 });
