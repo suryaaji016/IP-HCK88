@@ -21,8 +21,14 @@ export default function Home() {
     if (loading || !hasMore) return;
     setLoading(true);
     try {
+      const token = localStorage.getItem("access_token");
       const { data } = await axios.get(
-        `http://localhost:3001/api/home?offset=${newOffset}&limit=12`
+        `http://localhost:3001/api/home?offset=${newOffset}&limit=12`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (newOffset === 0) {
         setTracks(data.tracks);
@@ -68,9 +74,15 @@ export default function Home() {
     setAiLoading(true);
     setAiData(null);
     try {
+      const token = localStorage.getItem("access_token");
       const { data } = await axios.post(
         "http://localhost:3001/api/generate-ai",
-        { prompt: mood }
+        { prompt: mood },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setAiData(data);
     } catch (err) {

@@ -402,14 +402,20 @@ body {
   margin-bottom: 2rem;
 }
 
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
 .detail-play-button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  max-width: 300px;
-  margin: 0 auto;
   padding: 1rem 2rem;
   font-size: 1.125rem;
   font-weight: 700;
@@ -425,6 +431,286 @@ body {
   background: #1ed760;
   transform: scale(1.05);
   box-shadow: 0 8px 24px rgba(29, 185, 84, 0.4);
+}
+
+.detail-playlist-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 30px;
+  background: var(--spotify-gray);
+  color: var(--text-white);
+  border: 2px solid var(--spotify-green);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.detail-playlist-button:hover {
+  background: var(--hover-gray);
+  transform: scale(1.05);
+  border-color: #1ed760;
+}
+
+/* ========================================
+   🎭 MODAL STYLING
+   ======================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.modal-subtitle {
+  color: var(--text-gray);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.modal-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-gray);
+}
+
+.modal-empty p {
+  margin-bottom: 1rem;
+}
+
+.modal-link {
+  display: inline-block;
+  color: var(--spotify-green);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  background: var(--spotify-gray);
+  border-radius: 25px;
+  transition: var(--transition);
+}
+
+.modal-link:hover {
+  background: var(--hover-gray);
+  transform: scale(1.05);
+}
+
+.modal-select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--spotify-dark);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: var(--text-white);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-select:focus {
+  outline: none;
+  border-color: var(--spotify-green);
+}
+
+.modal-select option {
+  background: var(--spotify-dark);
+  color: var(--text-white);
+  padding: 1rem;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--spotify-dark);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: var(--text-white);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--spotify-green);
+}
+
+.modal-input::placeholder {
+  color: var(--text-gray);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-cancel-btn {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid var(--spotify-gray);
+  border-radius: 25px;
+  color: var(--text-white);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-cancel-btn:hover {
+  background: var(--spotify-gray);
+  border-color: var(--hover-gray);
+}
+
+.modal-add-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--spotify-green);
+  border: none;
+  border-radius: 25px;
+  color: var(--spotify-black);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-add-btn:hover:not(:disabled) {
+  background: #1ed760;
+  transform: scale(1.05);
+}
+
+.modal-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   🎵 PLAYLIST DETAIL MODAL
+   ======================================== */
+.playlist-detail-modal {
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.playlist-songs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.playlist-song-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--spotify-dark);
+  padding: 1rem;
+  border-radius: 12px;
+  transition: var(--transition);
+}
+
+.playlist-song-item:hover {
+  background: var(--spotify-gray);
+}
+
+.playlist-song-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.playlist-song-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.playlist-song-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-white);
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-song-artist {
+  font-size: 0.875rem;
+  color: var(--text-gray);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-song-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.playlist-song-detail-btn,
+.playlist-song-delete-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playlist-song-detail-btn {
+  background: var(--spotify-green);
+  color: var(--spotify-black);
+}
+
+.playlist-song-detail-btn:hover {
+  background: #1ed760;
+  transform: scale(1.1);
+}
+
+.playlist-song-delete-btn {
+  background: #e22134;
+  color: white;
+}
+
+.playlist-song-delete-btn:hover {
+  background: #ff2d3f;
+  transform: scale(1.1);
 }
 
 /* ========================================
@@ -453,6 +739,17 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -505,6 +802,14 @@ body {
   .detail-title {
     font-size: 1.75rem;
   }
+
+  .auth-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-form {
+    padding: 2rem 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -523,4 +828,292 @@ body {
   .track-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .auth-form {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ========================================
+   🔐 AUTH PAGES (LOGIN & REGISTER)
+   ======================================== */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--spotify-dark) 0%, #0a0a0a 100%);
+}
+
+.auth-form {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.5s ease;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--spotify-dark);
+  border: 2px solid transparent;
+  border-radius: 30px;
+  color: var(--text-white);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--spotify-green);
+  background: #1a1a1a;
+}
+
+.auth-form input::placeholder {
+  color: var(--text-gray);
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--spotify-green);
+  color: var(--spotify-black);
+  border: none;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 1.5rem;
+}
+
+.auth-form button:hover:not(:disabled) {
+  background: #1ed760;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+}
+
+.auth-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-form p {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+}
+
+.auth-form a {
+  color: var(--spotify-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.auth-form a:hover {
+  color: #1ed760;
+  text-decoration: underline;
+}
+
+/* ========================================
+   🎶 PLAYLIST PAGE STYLING
+   ======================================== */
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.playlist-create-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.playlist-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-gray);
+}
+
+.playlist-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.playlist-empty-text {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.playlist-empty-subtext {
+  font-size: 0.95rem;
+  color: var(--text-gray);
+}
+
+.playlist-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+}
+
+.playlist-card:hover {
+  background: var(--spotify-gray);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+.playlist-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--spotify-green), #1ed760);
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.playlist-card:hover::before {
+  transform: scaleX(1);
+}
+
+.playlist-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.playlist-info {
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.playlist-count {
+  display: inline-block;
+  background: var(--spotify-dark);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.875rem;
+  color: var(--spotify-green);
+  margin-bottom: 1rem;
+}
+
+.playlist-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.playlist-edit-btn {
+  background: var(--spotify-green) !important;
+  color: var(--spotify-black) !important;
+  flex: 1;
+}
+
+.playlist-edit-btn:hover {
+  background: #1ed760 !important;
+  transform: scale(1.05);
+}
+
+.playlist-delete-btn {
+  width: 100%;
+  background: #e22134 !important;
+  color: white !important;
+  flex: 1;
+}
+
+.playlist-delete-btn:hover {
+  background: #ff2d3f !important;
+  transform: scale(1.05);
+}
+
+.playlist-edit-btn {
+  background: var(--spotify-gray);
+  color: var(--text-white);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+}
+
+.playlist-edit-btn:hover {
+  background: var(--hover-gray);
+}
+
+/* ========================================
+   🎵 ADDITIONAL UTILITY CLASSES
+   ======================================== */
+.btn-secondary {
+  background: var(--spotify-gray) !important;
+  color: var(--text-white) !important;
+}
+
+.btn-secondary:hover {
+  background: var(--hover-gray) !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.success-message {
+  background: rgba(29, 185, 84, 0.2);
+  border: 1px solid var(--spotify-green);
+  color: var(--spotify-green);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-message {
+  background: rgba(226, 33, 52, 0.2);
+  border: 1px solid #e22134;
+  color: #ff2d3f;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
 }

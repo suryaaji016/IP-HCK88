@@ -6,6 +6,7 @@ import "./App.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Playlist from "./pages/Playlist";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function AuthLayout() {
   return (
@@ -20,10 +21,18 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 🌐 Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route element={<AuthLayout />}>
+        {/* 🔒 Protected Routes with Navbar */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AuthLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/" element={<Home />} />
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/playlist" element={<Playlist />} />

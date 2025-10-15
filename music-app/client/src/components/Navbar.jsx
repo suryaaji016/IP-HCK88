@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  }
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -21,7 +28,9 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <button className="navbar-logout">Logout</button>
+            <button className="navbar-logout" onClick={handleLogout}>
+              Logout
+            </button>
           </li>
         </ul>
       </div>

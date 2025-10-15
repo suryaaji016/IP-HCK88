@@ -24,27 +24,42 @@ export default function Register() {
 
   return (
     <div className="auth-container">
-      <h1 className="home-title">📝 Register</h1>
+      <div className="navbar-logo" style={{ marginBottom: "2rem" }}>
+        <span className="navbar-logo-icon">🎵</span>
+        <span>MusicApp</span>
+      </div>
+      <h1 className="home-title" style={{ marginBottom: "1rem" }}>
+        📝 Register
+      </h1>
+      <p
+        style={{
+          color: "var(--text-gray)",
+          marginBottom: "2rem",
+          textAlign: "center",
+        }}
+      >
+        Daftar untuk mulai menggunakan MusicApp
+      </p>
       <form onSubmit={handleRegister} className="auth-form">
         <input
           type="email"
-          placeholder="Email"
+          placeholder="📧 Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="🔒 Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit" disabled={loading}>
-          {loading ? "⏳ Loading..." : "Register"}
+          {loading ? "⏳ Loading..." : "🎵 Register"}
         </button>
         <p>
-          Sudah punya akun? <Link to="/login">Login</Link>
+          Sudah punya akun? <Link to="/login">Login Sekarang</Link>
         </p>
       </form>
     </div>

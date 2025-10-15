@@ -27,27 +27,42 @@ export default function Login() {
 
   return (
     <div className="auth-container">
-      <h1 className="home-title">🔐 Login</h1>
+      <div className="navbar-logo" style={{ marginBottom: "2rem" }}>
+        <span className="navbar-logo-icon">🎵</span>
+        <span>MusicApp</span>
+      </div>
+      <h1 className="home-title" style={{ marginBottom: "1rem" }}>
+        🔐 Login
+      </h1>
+      <p
+        style={{
+          color: "var(--text-gray)",
+          marginBottom: "2rem",
+          textAlign: "center",
+        }}
+      >
+        Login untuk mengakses playlist dan fitur menarik lainnya
+      </p>
       <form onSubmit={handleLogin} className="auth-form">
         <input
           type="email"
-          placeholder="Email"
+          placeholder="📧 Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="🔒 Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit" disabled={loading}>
-          {loading ? "⏳ Loading..." : "Login"}
+          {loading ? "⏳ Loading..." : "🎵 Login"}
         </button>
         <p>
-          Belum punya akun? <Link to="/register">Daftar</Link>
+          Belum punya akun? <Link to="/register">Daftar Sekarang</Link>
         </p>
       </form>
     </div>

@@ -92,26 +92,79 @@ async function analyzeMood(prompt) {
       apiKey: process.env.GEMINI_API_KEY,
     });
 
-    // 🔹 Prompt utama untuk AI
+    // 🔹 Prompt yang disempurnakan untuk AI
     const detailedPrompt = `
-      Analisis kalimat berikut dan tentukan suasana hati serta genre musik yang cocok:
-      "${userPrompt}"
+Kamu adalah seorang music therapist expert yang sangat memahami hubungan antara emosi manusia dan musik.
 
-      Berikan jawaban dalam format JSON seperti contoh:
-      {"mood":"sedih dan galau","genre":"romance"}
+Analisis kalimat/situasi berikut dengan cermat:
+"${userPrompt}"
 
-      Panduan pemetaan suasana hati:
-      - Jika marah → rock
-      - Jika galau/sedih → romance
-      - Jika belajar/fokus → study
-      - Jika santai/tenang → chill
-      - Jika semangat → pop
-      - Jika tidur → sleep
-      - Jika tidak jelas → netral dan genre pop
-    `;
+Tugasmu:
+1. Pahami konteks emosional dan situasi yang sedang dialami user
+2. Tentukan mood yang paling tepat menggambarkan perasaan tersebut
+3. Pilih 2-3 genre Spotify yang PALING COCOK untuk mood tersebut
+4. Tentukan kata kunci pencarian yang spesifik untuk Spotify API
+
+PENTING - Panduan Genre Spotify (gunakan genre yang valid di Spotify):
+- Sedih/Galau/Patah Hati → Genre: "sad", "acoustic", "indie" | Keywords: "heartbreak", "sad love songs", "melancholic"
+- Marah/Kesal/Frustrasi → Genre: "rock", "metal", "hard rock" | Keywords: "angry", "aggressive rock", "metal"
+- Santai/Relaks/Chill → Genre: "chill", "lo-fi", "ambient" | Keywords: "chill vibes", "relaxing", "lo-fi beats"
+- Belajar/Fokus → Genre: "study", "classical", "instrumental" | Keywords: "study music", "focus", "concentration"
+- Senang/Bahagia/Ceria → Genre: "pop", "happy", "dance" | Keywords: "happy songs", "feel good", "uplifting"
+- Semangat/Workout/Energik → Genre: "workout", "edm", "hip-hop" | Keywords: "workout", "pump up", "energetic"
+- Romantis/Jatuh Cinta → Genre: "romance", "r-n-b", "love" | Keywords: "love songs", "romantic", "r&b love"
+- Nostalgia/Kenangan → Genre: "indie", "alternative", "80s" | Keywords: "nostalgic", "throwback", "memories"
+- Hujan/Mendung → Genre: "jazz", "acoustic", "indie" | Keywords: "rainy day", "coffee shop", "mellow"
+- Malam/Mengantuk → Genre: "sleep", "ambient", "piano" | Keywords: "sleep music", "night time", "relaxing piano"
+- Pesta/Party → Genre: "party", "dance", "edm" | Keywords: "party songs", "dance hits", "club music"
+- Motivasi/Inspirasi → Genre: "motivational", "rock", "hip-hop" | Keywords: "motivational", "inspiring", "empowering"
+- Melankolis/Emosional → Genre: "classical", "sad", "piano" | Keywords: "emotional", "melancholic", "sad piano"
+- Produktif/Kerja → Genre: "instrumental", "electronic", "ambient" | Keywords: "productive", "work music", "background"
+
+Format JSON yang HARUS kamu kembalikan (HANYA JSON, tanpa teks lain):
+{
+  "mood": "[deskripsi mood dalam bahasa Indonesia, max 30 karakter]",
+  "genre": "[genre utama, pilih 1]",
+  "genres": ["[genre1]", "[genre2]", "[genre3]"],
+  "searchQuery": "[kata kunci pencarian untuk Spotify]",
+  "audioFeatures": {
+    "energy": [0.0-1.0],
+    "valence": [0.0-1.0],
+    "tempo": ["slow/medium/fast"]
+  }
+}
+
+Contoh response untuk "galau habis di tinggalin pacar":
+{
+  "mood": "sedih dan patah hati",
+  "genre": "sad",
+  "genres": ["sad", "acoustic", "indie"],
+  "searchQuery": "heartbreak sad love songs",
+  "audioFeatures": {
+    "energy": 0.3,
+    "valence": 0.2,
+    "tempo": "slow"
+  }
+}
+
+Contoh response untuk "semangat pagi mau olahraga":
+{
+  "mood": "energik dan semangat",
+  "genre": "workout",
+  "genres": ["workout", "edm", "hip-hop"],
+  "searchQuery": "workout pump up energetic",
+  "audioFeatures": {
+    "energy": 0.9,
+    "valence": 0.8,
+    "tempo": "fast"
+  }
+}
+
+JAWAB SEKARANG dengan format JSON yang benar!
+`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash-exp",
       contents: detailedPrompt,
     });
 
@@ -124,44 +177,152 @@ async function analyzeMood(prompt) {
     const match = clean.match(/\{[\s\S]*\}/);
     const parsed = match
       ? JSON.parse(match[0])
-      : { mood: "netral", genre: "pop" };
+      : {
+          mood: "netral",
+          genre: "pop",
+          genres: ["pop", "indie", "acoustic"],
+          searchQuery: "popular songs",
+          audioFeatures: { energy: 0.5, valence: 0.5, tempo: "medium" },
+        };
 
     console.log("✅ Gemini result:", parsed);
     return parsed;
   } catch (err) {
     console.error("⚠️ Gemini gagal:", err.message);
 
+    // Fallback sederhana berdasarkan kata kunci
     const lower = (prompt || "").toLowerCase();
+
+    // if (lower.includes("sedih") || lower.includes("galau")) {
+    //   return {
+    //     mood: "sedih dan galau",
+    //     genre: "sad",
+    //     genres: ["sad", "acoustic", "indie"],
+    //     searchQuery: "sad love songs heartbreak",
+    //     audioFeatures: { energy: 0.3, valence: 0.2, tempo: "slow" },
+    //   };
+    // } else if (lower.includes("senang") || lower.includes("bahagia")) {
+    //   return {
+    //     mood: "bahagia",
+    //     genre: "pop",
+    //     genres: ["pop", "happy", "dance"],
+    //     searchQuery: "happy feel good songs",
+    //     audioFeatures: { energy: 0.7, valence: 0.8, tempo: "medium" },
+    //   };
+    // } else if (lower.includes("semangat") || lower.includes("olahraga")) {
+    //   return {
+    //     mood: "energik",
+    //     genre: "workout",
+    //     genres: ["workout", "edm", "hip-hop"],
+    //     searchQuery: "workout pump up music",
+    //     audioFeatures: { energy: 0.9, valence: 0.7, tempo: "fast" },
+    //   };
+    // }
+
+    // // Default fallback
+    // return {
+    //   mood: "netral",
+    //   genre: "pop",
+    //   genres: ["pop", "indie", "acoustic"],
+    //   searchQuery: "popular songs",
+    //   audioFeatures: { energy: 0.5, valence: 0.5, tempo: "medium" },
+    // };
   }
 }
 
 // =======================================================
-// 🎧 AI Playlist (5 Lagu Acak Berdasarkan Mood)
+// 🎧 AI Playlist (Lagu Berdasarkan Mood dengan Spotify)
 // =======================================================
 app.post("/api/generate-ai", async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ message: "Prompt is required" });
 
   try {
-    const { mood, genre } = await analyzeMood(prompt);
+    const aiResult = await analyzeMood(prompt);
+    const { mood, genre, genres, searchQuery, audioFeatures } = aiResult;
     const token = await getSpotifyToken();
-    const offset = Math.floor(Math.random() * 400);
 
-    const response = await axios.get(
-      `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=5&offset=${offset}`,
-      { headers: { Authorization: `Bearer ${token}` } }
+    console.log("🎵 AI Analysis:", { mood, genre, searchQuery });
+
+    // 🔹 Strategy 1: Search menggunakan kata kunci spesifik
+    let allTracks = [];
+
+    try {
+      const searchResponse = await axios.get(
+        `https://api.spotify.com/v1/search`,
+        {
+          params: {
+            q: searchQuery,
+            type: "track",
+            limit: 10,
+            market: "US",
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (searchResponse.data.tracks?.items?.length > 0) {
+        allTracks = allTracks.concat(searchResponse.data.tracks.items);
+      }
+    } catch (err) {
+      console.log("⚠️ Search query failed, trying genre...");
+    }
+
+    // 🔹 Strategy 2: Search by genre jika perlu lebih banyak lagu
+    if (allTracks.length < 10) {
+      for (const g of genres || [genre]) {
+        try {
+          const genreResponse = await axios.get(
+            `https://api.spotify.com/v1/search`,
+            {
+              params: {
+                q: `genre:"${g}"`,
+                type: "track",
+                limit: 10,
+                market: "US",
+              },
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (genreResponse.data.tracks?.items?.length > 0) {
+            allTracks = allTracks.concat(genreResponse.data.tracks.items);
+          }
+        } catch (err) {
+          console.log(`⚠️ Genre ${g} search failed`);
+        }
+      }
+    }
+
+    // 🔹 Deduplicate dan ambil 5-8 lagu terbaik
+    const uniqueTracks = Array.from(
+      new Map(allTracks.map((t) => [t.id, t])).values()
     );
 
-    const tracks = response.data.tracks.items.map((t) => ({
+    // 🔹 Shuffle dan ambil 5-8 lagu random
+    const shuffled = uniqueTracks.sort(() => Math.random() - 0.5);
+    const selectedTracks = shuffled.slice(0, Math.min(8, shuffled.length));
+
+    const tracks = selectedTracks.map((t) => ({
       id: t.id,
       name: t.name,
       artist: t.artists.map((a) => a.name).join(", "),
       album: t.album.name,
-      image: t.album.images[0]?.url,
+      image: t.album.images[0]?.url || t.album.images[1]?.url,
       spotify_url: t.external_urls?.spotify,
     }));
 
-    res.json({ mood, genre, tracks });
+    console.log(`✅ Found ${tracks.length} tracks for mood: ${mood}`);
+
+    res.json({
+      mood,
+      genre,
+      genres: genres || [genre],
+      searchQuery,
+      audioFeatures,
+      tracks,
+      totalFound: uniqueTracks.length,
+    });
   } catch (err) {
     console.error("❌ Error /api/generate-ai:", err.message);
     res.status(500).json({ message: "Gagal generate playlist AI" });
@@ -250,6 +411,23 @@ app.post("/api/playlists", async (req, res) => {
     const { name } = req.body;
     const playlist = await Playlist.create({ name, UserId: req.user.id });
     res.status(201).json(playlist);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+app.put("/api/playlists/:id", async (req, res) => {
+  try {
+    const { name } = req.body;
+    const playlist = await Playlist.findOne({
+      where: { id: req.params.id, UserId: req.user.id },
+    });
+    if (!playlist)
+      return res.status(404).json({ message: "Playlist not found" });
+
+    playlist.name = name;
+    await playlist.save();
+    res.json(playlist);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
