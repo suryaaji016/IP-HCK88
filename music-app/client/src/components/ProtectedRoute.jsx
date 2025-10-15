@@ -1,4 +1,3 @@
-// ✅ versi yang dijamin jalan di react-router (tanpa dom)
 import { Navigate } from "react-router";
 
 export default function ProtectedRoute({ children }) {

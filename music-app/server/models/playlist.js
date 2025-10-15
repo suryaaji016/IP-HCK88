@@ -4,7 +4,6 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Playlist extends Model {
     static associate(models) {
-      // 1 Playlist milik 1 User
       Playlist.belongsTo(models.User, { foreignKey: "UserId" });
       Playlist.hasMany(models.MusicList, { foreignKey: "PlaylistId" });
     }

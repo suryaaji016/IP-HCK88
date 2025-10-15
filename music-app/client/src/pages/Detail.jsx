@@ -29,7 +29,7 @@ export default function Detail() {
       );
       setTrack(data);
     } catch (err) {
-      console.error("❌ Error fetching track:", err);
+      console.error("Error fetching track:", err);
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ export default function Detail() {
       });
       setPlaylists(data);
     } catch (err) {
-      console.error("❌ Error fetching playlists:", err);
+      console.error("Error fetching playlists:", err);
     }
   }
 
@@ -74,11 +74,11 @@ export default function Detail() {
           },
         }
       );
-      alert("✅ Lagu berhasil ditambahkan ke playlist!");
+      alert("Lagu berhasil ditambahkan ke playlist!");
       setShowPlaylistModal(false);
       setSelectedPlaylist("");
     } catch (err) {
-      console.error("❌ Error adding to playlist:", err);
+      console.error("Error adding to playlist:", err);
       alert(err.response?.data?.message || "Gagal menambahkan ke playlist");
     } finally {
       setAddingToPlaylist(false);

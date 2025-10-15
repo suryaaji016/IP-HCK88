@@ -18,10 +18,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Users", // menghubungkan ke tabel Users
+          model: "Users",
           key: "id",
         },
-        onDelete: "CASCADE", // jika user dihapus, playlist ikut terhapus
+        onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
       createdAt: {

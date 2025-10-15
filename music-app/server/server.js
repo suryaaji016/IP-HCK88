@@ -7,10 +7,13 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const { GoogleGenAI } = require("@google/genai");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3001;
 
 app.post("/register", async (req, res) => {
@@ -46,14 +49,41 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// =======================================================
-// 🧱 Middleware Authentication (JWT)
-// =======================================================
+app.post("/login/google", async (req, res) => {
+  const { id_token } = req.body;
+  try {
+    // Verifikasi token dari frontend
+    const ticket = await client.verifyIdToken({
+      idToken: id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email } = ticket.getPayload();
+
+    // Cari user berdasarkan email
+    let [user, created] = await User.findOrCreate({
+      where: { email },
+      defaults: {
+        email,
+        password: Math.random().toString(36).slice(-8),
+      },
+    });
+
+    // Buat token JWT lokal
+    const access_token = signToken({ id: user.id });
+
+    res.status(created ? 201 : 200).json({
+      message: "Login Google sukses",
+      access_token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ message: "Token Google tidak valid" });
+  }
+});
+
 app.use(authentication);
 
-// =======================================================
-// 🔑 Ambil Token Spotify
-// =======================================================
 async function getSpotifyToken() {
   const res = await axios.post(
     "https://accounts.spotify.com/api/token",
@@ -72,9 +102,6 @@ async function getSpotifyToken() {
   return res.data.access_token;
 }
 
-// =======================================================
-// 🤖 Analisis Mood (Gemini AI)
-// =======================================================
 async function analyzeMood(prompt) {
   try {
     console.log(
@@ -82,98 +109,93 @@ async function analyzeMood(prompt) {
       process.env.GEMINI_API_KEY ? "ADA" : "TIDAK ADA"
     );
 
-    // 🔹 Default prompt jika user tidak mengisi apa pun
     const userPrompt =
       prompt?.trim() ||
       "Saya tidak menulis apa pun, tolong tentukan suasana hati umum dan genre musik yang cocok.";
 
-    // 🔹 Buat instance Gemini AI
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
     });
 
-    // 🔹 Prompt yang disempurnakan untuk AI
     const detailedPrompt = `
-Kamu adalah seorang music therapist expert yang sangat memahami hubungan antara emosi manusia dan musik.
+      Kamu adalah seorang music therapist expert yang sangat memahami hubungan antara emosi manusia dan musik.
 
-Analisis kalimat/situasi berikut dengan cermat:
-"${userPrompt}"
+      Analisis kalimat/situasi berikut dengan cermat:
+      "${userPrompt}"
 
-Tugasmu:
-1. Pahami konteks emosional dan situasi yang sedang dialami user
-2. Tentukan mood yang paling tepat menggambarkan perasaan tersebut
-3. Pilih 2-3 genre Spotify yang PALING COCOK untuk mood tersebut
-4. Tentukan kata kunci pencarian yang spesifik untuk Spotify API
+      Tugasmu:
+      1. Pahami konteks emosional dan situasi yang sedang dialami user
+      2. Tentukan mood yang paling tepat menggambarkan perasaan tersebut
+      3. Pilih 2-3 genre Spotify yang PALING COCOK untuk mood tersebut
+      4. Tentukan kata kunci pencarian yang spesifik untuk Spotify API
 
-PENTING - Panduan Genre Spotify (gunakan genre yang valid di Spotify):
-- Sedih/Galau/Patah Hati → Genre: "sad", "acoustic", "indie" | Keywords: "heartbreak", "sad love songs", "melancholic"
-- Marah/Kesal/Frustrasi → Genre: "rock", "metal", "hard rock" | Keywords: "angry", "aggressive rock", "metal"
-- Santai/Relaks/Chill → Genre: "chill", "lo-fi", "ambient" | Keywords: "chill vibes", "relaxing", "lo-fi beats"
-- Belajar/Fokus → Genre: "study", "classical", "instrumental" | Keywords: "study music", "focus", "concentration"
-- Senang/Bahagia/Ceria → Genre: "pop", "happy", "dance" | Keywords: "happy songs", "feel good", "uplifting"
-- Semangat/Workout/Energik → Genre: "workout", "edm", "hip-hop" | Keywords: "workout", "pump up", "energetic"
-- Romantis/Jatuh Cinta → Genre: "romance", "r-n-b", "love" | Keywords: "love songs", "romantic", "r&b love"
-- Nostalgia/Kenangan → Genre: "indie", "alternative", "80s" | Keywords: "nostalgic", "throwback", "memories"
-- Hujan/Mendung → Genre: "jazz", "acoustic", "indie" | Keywords: "rainy day", "coffee shop", "mellow"
-- Malam/Mengantuk → Genre: "sleep", "ambient", "piano" | Keywords: "sleep music", "night time", "relaxing piano"
-- Pesta/Party → Genre: "party", "dance", "edm" | Keywords: "party songs", "dance hits", "club music"
-- Motivasi/Inspirasi → Genre: "motivational", "rock", "hip-hop" | Keywords: "motivational", "inspiring", "empowering"
-- Melankolis/Emosional → Genre: "classical", "sad", "piano" | Keywords: "emotional", "melancholic", "sad piano"
-- Produktif/Kerja → Genre: "instrumental", "electronic", "ambient" | Keywords: "productive", "work music", "background"
+      PENTING - Panduan Genre Spotify (gunakan genre yang valid di Spotify):
+      - Sedih/Galau/Patah Hati → Genre: "sad", "acoustic", "indie" | Keywords: "heartbreak", "sad love songs", "melancholic"
+      - Marah/Kesal/Frustrasi → Genre: "rock", "metal", "hard rock" | Keywords: "angry", "aggressive rock", "metal"
+      - Santai/Relaks/Chill → Genre: "chill", "lo-fi", "ambient" | Keywords: "chill vibes", "relaxing", "lo-fi beats"
+      - Belajar/Fokus → Genre: "study", "classical", "instrumental" | Keywords: "study music", "focus", "concentration"
+      - Senang/Bahagia/Ceria → Genre: "pop", "happy", "dance" | Keywords: "happy songs", "feel good", "uplifting"
+      - Semangat/Workout/Energik → Genre: "workout", "edm", "hip-hop" | Keywords: "workout", "pump up", "energetic"
+      - Romantis/Jatuh Cinta → Genre: "romance", "r-n-b", "love" | Keywords: "love songs", "romantic", "r&b love"
+      - Nostalgia/Kenangan → Genre: "indie", "alternative", "80s" | Keywords: "nostalgic", "throwback", "memories"
+      - Hujan/Mendung → Genre: "jazz", "acoustic", "indie" | Keywords: "rainy day", "coffee shop", "mellow"
+      - Malam/Mengantuk → Genre: "sleep", "ambient", "piano" | Keywords: "sleep music", "night time", "relaxing piano"
+      - Pesta/Party → Genre: "party", "dance", "edm" | Keywords: "party songs", "dance hits", "club music"
+      - Motivasi/Inspirasi → Genre: "motivational", "rock", "hip-hop" | Keywords: "motivational", "inspiring", "empowering"
+      - Melankolis/Emosional → Genre: "classical", "sad", "piano" | Keywords: "emotional", "melancholic", "sad piano"
+      - Produktif/Kerja → Genre: "instrumental", "electronic", "ambient" | Keywords: "productive", "work music", "background"
 
-Format JSON yang HARUS kamu kembalikan (HANYA JSON, tanpa teks lain):
-{
-  "mood": "[deskripsi mood dalam bahasa Indonesia, max 30 karakter]",
-  "genre": "[genre utama, pilih 1]",
-  "genres": ["[genre1]", "[genre2]", "[genre3]"],
-  "searchQuery": "[kata kunci pencarian untuk Spotify]",
-  "audioFeatures": {
-    "energy": [0.0-1.0],
-    "valence": [0.0-1.0],
-    "tempo": ["slow/medium/fast"]
-  }
-}
+      Format JSON yang HARUS kamu kembalikan (HANYA JSON, tanpa teks lain):
+      {
+        "mood": "[deskripsi mood dalam bahasa Indonesia, max 30 karakter]",
+        "genre": "[genre utama, pilih 1]",
+        "genres": ["[genre1]", "[genre2]", "[genre3]"],
+        "searchQuery": "[kata kunci pencarian untuk Spotify]",
+        "audioFeatures": {
+          "energy": [0.0-1.0],
+          "valence": [0.0-1.0],
+          "tempo": ["slow/medium/fast"]
+        }
+      }
 
-Contoh response untuk "galau habis di tinggalin pacar":
-{
-  "mood": "sedih dan patah hati",
-  "genre": "sad",
-  "genres": ["sad", "acoustic", "indie"],
-  "searchQuery": "heartbreak sad love songs",
-  "audioFeatures": {
-    "energy": 0.3,
-    "valence": 0.2,
-    "tempo": "slow"
-  }
-}
+      Contoh response untuk "galau habis di tinggalin pacar":
+      {
+        "mood": "sedih dan patah hati",
+        "genre": "sad",
+        "genres": ["sad", "acoustic", "indie"],
+        "searchQuery": "heartbreak sad love songs",
+        "audioFeatures": {
+          "energy": 0.3,
+          "valence": 0.2,
+          "tempo": "slow"
+        }
+      }
 
-Contoh response untuk "semangat pagi mau olahraga":
-{
-  "mood": "energik dan semangat",
-  "genre": "workout",
-  "genres": ["workout", "edm", "hip-hop"],
-  "searchQuery": "workout pump up energetic",
-  "audioFeatures": {
-    "energy": 0.9,
-    "valence": 0.8,
-    "tempo": "fast"
-  }
-}
+      Contoh response untuk "semangat pagi mau olahraga":
+      {
+        "mood": "energik dan semangat",
+        "genre": "workout",
+        "genres": ["workout", "edm", "hip-hop"],
+        "searchQuery": "workout pump up energetic",
+        "audioFeatures": {
+          "energy": 0.9,
+          "valence": 0.8,
+          "tempo": "fast"
+        }
+      }
 
-JAWAB SEKARANG dengan format JSON yang benar!
-`;
+      JAWAB SEKARANG dengan format JSON yang benar!
+      `;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash-exp",
       contents: detailedPrompt,
     });
 
-    // 🔹 Ambil hasil teks dari AI
     const text =
       (response.text || response.response?.text?.())?.toString() || "";
     const clean = text.replace(/```json|```/g, "").trim();
 
-    // 🔹 Ambil hanya JSON-nya
     const match = clean.match(/\{[\s\S]*\}/);
     const parsed = match
       ? JSON.parse(match[0])
@@ -185,54 +207,14 @@ JAWAB SEKARANG dengan format JSON yang benar!
           audioFeatures: { energy: 0.5, valence: 0.5, tempo: "medium" },
         };
 
-    console.log("✅ Gemini result:", parsed);
+    console.log("Gemini result:", parsed);
     return parsed;
   } catch (err) {
-    console.error("⚠️ Gemini gagal:", err.message);
-
-    // Fallback sederhana berdasarkan kata kunci
+    console.error("Gemini gagal:", err.message);
     const lower = (prompt || "").toLowerCase();
-
-    // if (lower.includes("sedih") || lower.includes("galau")) {
-    //   return {
-    //     mood: "sedih dan galau",
-    //     genre: "sad",
-    //     genres: ["sad", "acoustic", "indie"],
-    //     searchQuery: "sad love songs heartbreak",
-    //     audioFeatures: { energy: 0.3, valence: 0.2, tempo: "slow" },
-    //   };
-    // } else if (lower.includes("senang") || lower.includes("bahagia")) {
-    //   return {
-    //     mood: "bahagia",
-    //     genre: "pop",
-    //     genres: ["pop", "happy", "dance"],
-    //     searchQuery: "happy feel good songs",
-    //     audioFeatures: { energy: 0.7, valence: 0.8, tempo: "medium" },
-    //   };
-    // } else if (lower.includes("semangat") || lower.includes("olahraga")) {
-    //   return {
-    //     mood: "energik",
-    //     genre: "workout",
-    //     genres: ["workout", "edm", "hip-hop"],
-    //     searchQuery: "workout pump up music",
-    //     audioFeatures: { energy: 0.9, valence: 0.7, tempo: "fast" },
-    //   };
-    // }
-
-    // // Default fallback
-    // return {
-    //   mood: "netral",
-    //   genre: "pop",
-    //   genres: ["pop", "indie", "acoustic"],
-    //   searchQuery: "popular songs",
-    //   audioFeatures: { energy: 0.5, valence: 0.5, tempo: "medium" },
-    // };
   }
 }
 
-// =======================================================
-// 🎧 AI Playlist (Lagu Berdasarkan Mood dengan Spotify)
-// =======================================================
 app.post("/api/generate-ai", async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ message: "Prompt is required" });
@@ -244,7 +226,6 @@ app.post("/api/generate-ai", async (req, res) => {
 
     console.log("🎵 AI Analysis:", { mood, genre, searchQuery });
 
-    // 🔹 Strategy 1: Search menggunakan kata kunci spesifik
     let allTracks = [];
 
     try {
@@ -268,7 +249,6 @@ app.post("/api/generate-ai", async (req, res) => {
       console.log("⚠️ Search query failed, trying genre...");
     }
 
-    // 🔹 Strategy 2: Search by genre jika perlu lebih banyak lagu
     if (allTracks.length < 10) {
       for (const g of genres || [genre]) {
         try {
@@ -294,12 +274,10 @@ app.post("/api/generate-ai", async (req, res) => {
       }
     }
 
-    // 🔹 Deduplicate dan ambil 5-8 lagu terbaik
     const uniqueTracks = Array.from(
       new Map(allTracks.map((t) => [t.id, t])).values()
     );
 
-    // 🔹 Shuffle dan ambil 5-8 lagu random
     const shuffled = uniqueTracks.sort(() => Math.random() - 0.5);
     const selectedTracks = shuffled.slice(0, Math.min(8, shuffled.length));
 
@@ -312,7 +290,7 @@ app.post("/api/generate-ai", async (req, res) => {
       spotify_url: t.external_urls?.spotify,
     }));
 
-    console.log(`✅ Found ${tracks.length} tracks for mood: ${mood}`);
+    console.log(` Found ${tracks.length} tracks for mood: ${mood}`);
 
     res.json({
       mood,
@@ -324,14 +302,11 @@ app.post("/api/generate-ai", async (req, res) => {
       totalFound: uniqueTracks.length,
     });
   } catch (err) {
-    console.error("❌ Error /api/generate-ai:", err.message);
+    console.error(" Error /api/generate-ai:", err.message);
     res.status(500).json({ message: "Gagal generate playlist AI" });
   }
 });
 
-// =======================================================
-// 🏠 Home: Lagu Random + Infinite Scroll
-// =======================================================
 app.get("/api/home", async (req, res) => {
   try {
     const token = await getSpotifyToken();
@@ -365,9 +340,6 @@ app.get("/api/home", async (req, res) => {
   }
 });
 
-// =======================================================
-// 🎵 Detail Lagu
-// =======================================================
 app.get("/api/detail/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -389,7 +361,7 @@ app.get("/api/detail/:id", async (req, res) => {
 
     res.json(track);
   } catch (err) {
-    console.error("❌ Error /api/detail:", err.message);
+    console.error(" Error /api/detail:", err.message);
     res.status(404).json({ message: "Track not found" });
   }
 });
@@ -448,9 +420,6 @@ app.delete("/api/playlists/:id", async (req, res) => {
   }
 });
 
-// =======================================================
-// 🎶 MUSICLIST CRUD (Lagu per Playlist)
-// =======================================================
 app.post("/api/playlists/:id/music", async (req, res) => {
   try {
     const { spotifyId, name, artist, album, image, spotify_url } = req.body;
@@ -488,9 +457,6 @@ app.delete("/api/playlists/:id/music/:musicId", async (req, res) => {
   }
 });
 
-// =======================================================
-// 🚀 Start Server
-// =======================================================
 app.listen(PORT, () =>
-  console.log(`✅ Server running at http://localhost:${PORT}`)
+  console.log(` Server running at http://localhost:${PORT}`)
 );

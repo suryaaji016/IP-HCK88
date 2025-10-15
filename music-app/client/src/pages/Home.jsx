@@ -14,9 +14,6 @@ export default function Home() {
   const [aiLoading, setAiLoading] = useState(false);
   const [mood, setMood] = useState("");
 
-  // =====================================================
-  // 🎧 Fetch Lagu Random (pagination by offset)
-  // =====================================================
   async function fetchSongs(newOffset = 0) {
     if (loading || !hasMore) return;
     setLoading(true);
@@ -48,9 +45,6 @@ export default function Home() {
     fetchSongs(0);
   }, []);
 
-  // =====================================================
-  // 📜 Infinite Scroll
-  // =====================================================
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -66,11 +60,8 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [offset, loading, hasMore]);
 
-  // =====================================================
-  // 🤖 Generate AI Playlist
-  // =====================================================
   async function generateAIPlaylist() {
-    if (!mood.trim()) return alert("Tulis suasana hati kamu dulu ya 🎧");
+    if (!mood.trim()) return alert("Tulis suasana hati kamu dulu ya");
     setAiLoading(true);
     setAiData(null);
     try {
@@ -86,16 +77,13 @@ export default function Home() {
       );
       setAiData(data);
     } catch (err) {
-      console.error("❌ Gagal generate playlist:", err);
-      alert("AI gagal menebak mood kamu 😢");
+      console.error("Gagal generate playlist:", err);
+      alert("AI gagal menebak mood kamu, coba lagi ya!");
     } finally {
       setAiLoading(false);
     }
   }
 
-  // =====================================================
-  // 🎵 Track Card
-  // =====================================================
   function TrackCard({ track }) {
     return (
       <div className="track-card" key={track.id}>
@@ -112,16 +100,10 @@ export default function Home() {
     );
   }
 
-  // =====================================================
-  // 🖼️ UI Rendering
-  // =====================================================
   return (
     <div className="home-container">
       <h1 className="home-title">🎵 Music Recommender</h1>
 
-      {/* ========================= */}
-      {/* 🤖 AI Mood Analyzer */}
-      {/* ========================= */}
       <section className="ai-section">
         <div className="ai-header">
           <h2 className="ai-title">🤖 AI Mood Analyzer</h2>
@@ -165,13 +147,10 @@ export default function Home() {
         )}
       </section>
 
-      {/* ========================= */}
-      {/* 🔄 Lagu Random + Infinite Scroll */}
-      {/* ========================= */}
       <h2 className="section-title">🎸 Discover Music</h2>
       <div className="track-grid">
-        {tracks.map((track) => (
-          <TrackCard key={track.id} track={track} />
+        {tracks.map((track, index) => (
+          <TrackCard key={`${track.id}-${index}`} track={track} />
         ))}
       </div>
 

@@ -923,6 +923,112 @@ body {
   text-decoration: underline;
 }
 
+/* Auth Page Additional Elements */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+  color: var(--text-white);
+}
+
+.auth-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--spotify-green) 0%, #1ed760 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-subtitle {
+  color: var(--text-gray);
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--spotify-green);
+  color: var(--spotify-black);
+  border: none;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 0;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: #1ed760;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-divider-text {
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.auth-footer {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  margin-top: 1.5rem;
+}
+
+.auth-link {
+  color: var(--spotify-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.auth-link:hover {
+  color: #1ed760;
+  text-decoration: underline;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* ========================================
    🎶 PLAYLIST PAGE STYLING
    ======================================== */
