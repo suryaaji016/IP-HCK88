@@ -28,8 +28,10 @@ async function authentication(req, res, next) {
 
     next();
   } catch (err) {
-    console.error("❌ Authentication failed:", err.message || err.name);
-    res.status(401).json({ message: "Invalid or missing token" });
+    if (process.env.NODE_ENV !== "test") {
+      console.error("❌ Authentication failed:", err.message || err.name);
+    }
+    res.status(401).json({ message: "Invalid token" });
   }
 }
 
