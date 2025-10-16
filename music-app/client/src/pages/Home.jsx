@@ -73,7 +73,7 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <h1 className="home-title">🎵 Music Recommender</h1>
+      <h1 className="home-title">Music Recommender</h1>
 
       <AIMoodAnalyzer onResultsGenerated={handleGeneratePlaylist} />
 
@@ -86,7 +86,7 @@ export default function Home() {
         </div>
       )}
 
-      <h2 className="section-title">🎸 Discover Music</h2>
+      <h2 className="section-title">Discover Music</h2>
       <TrackGrid tracks={tracks} />
 
       {loading && <LoadingSpinner message="Memuat lagu..." />}
