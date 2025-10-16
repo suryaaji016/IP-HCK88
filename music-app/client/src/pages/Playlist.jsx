@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setPlaylists } from "../store/slices/playlistsSlice";
+import playlistsAPI from "../api/playlists";
+import PlaylistCard from "../components/PlaylistCard";
+import Modal from "../components/Modal";
 
 export default function Playlist() {
   const navigate = useNavigate();
-  const [playlists, setPlaylists] = useState([]);
+  const dispatch = useDispatch();
+  const playlists = useSelector((state) => state.playlists.playlists);
+
   const [newName, setNewName] = useState("");
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -12,79 +18,32 @@ export default function Playlist() {
   const [editingPlaylist, setEditingPlaylist] = useState(null);
   const [editName, setEditName] = useState("");
 
-  // Get fresh token every time
-  const getToken = () => {
-    const token = localStorage.getItem("access_token");
-    console.log("🔑 Getting token:", token ? "EXISTS" : "MISSING");
-    if (!token) {
-      console.error("❌ No token found, redirecting to login");
-      navigate("/login");
-      return null;
-    }
-    return token;
-  };
-
-  async function fetchPlaylists() {
-    const token = getToken();
-    if (!token) return;
-
+  const fetchPlaylists = useCallback(async () => {
     try {
-      console.log("📡 Fetching playlists with token...");
-      const { data } = await axios.get("http://localhost:3001/api/playlists", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("✅ Playlists fetched:", data.length);
-      setPlaylists(data);
+      const data = await playlistsAPI.getAll();
+      dispatch(setPlaylists(data));
     } catch (err) {
-      console.error(
-        "❌ Gagal ambil playlist:",
-        err.response?.data || err.message
-      );
+      console.error("❌ Gagal ambil playlist:", err.message);
       if (err.response?.status === 401) {
-        alert("Session expired, please login again");
-        localStorage.removeItem("access_token");
         navigate("/login");
       }
     }
-  }
+  }, [dispatch, navigate]);
 
   async function createPlaylist() {
     if (!newName.trim()) {
       alert("⚠️ Nama playlist tidak boleh kosong!");
       return;
     }
-
-    const token = getToken();
-    if (!token) return;
-
     try {
-      console.log("📝 Creating playlist:", newName);
-      console.log(
-        "🔐 Authorization header:",
-        `Bearer ${token.substring(0, 20)}...`
-      );
-
-      const response = await axios.post(
-        "http://localhost:3001/api/playlists",
-        { name: newName },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      console.log("✅ Playlist created successfully:", response.data);
+      console.log("🔄 Creating playlist:", newName);
+      await playlistsAPI.create({ name: newName });
       setNewName("");
       fetchPlaylists();
       alert("✅ Playlist berhasil dibuat!");
     } catch (err) {
-      console.error(
-        "❌ Error creating playlist:",
-        err.response?.data || err.message
-      );
+      console.error("❌ Error creating playlist:", err);
       alert(err.response?.data?.message || "Gagal buat playlist");
-
-      if (err.response?.status === 401) {
-        localStorage.removeItem("access_token");
-        navigate("/login");
-      }
     }
   }
 
@@ -93,28 +52,17 @@ export default function Playlist() {
       alert("Nama playlist tidak boleh kosong!");
       return;
     }
-
-    const token = getToken();
-    if (!token) return;
-
     try {
-      await axios.put(
-        `http://localhost:3001/api/playlists/${editingPlaylist.id}`,
-        { name: editName },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      console.log("🔄 Updating playlist:", editingPlaylist.id, editName);
+      await playlistsAPI.update(editingPlaylist.id, { name: editName });
       setShowEditModal(false);
       setEditingPlaylist(null);
       setEditName("");
       fetchPlaylists();
       alert("✅ Playlist berhasil diupdate!");
     } catch (err) {
-      console.error("❌ Gagal update playlist:", err);
-      alert("Gagal update playlist");
-      if (err.response?.status === 401) {
-        localStorage.removeItem("access_token");
-        navigate("/login");
-      }
+      console.error("❌ Error updating playlist:", err);
+      alert(err.response?.data?.message || "Gagal update playlist");
     }
   }
 
@@ -127,14 +75,9 @@ export default function Playlist() {
 
   async function deletePlaylist(id) {
     if (!confirm("Hapus playlist ini?")) return;
-
-    const token = getToken();
-    if (!token) return;
-
     try {
-      await axios.delete(`http://localhost:3001/api/playlists/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      console.log("🔄 Deleting playlist:", id);
+      await playlistsAPI.delete(id);
       fetchPlaylists();
       if (selectedPlaylist?.id === id) {
         setShowDetailModal(false);
@@ -142,30 +85,17 @@ export default function Playlist() {
       }
       alert("✅ Playlist berhasil dihapus!");
     } catch (err) {
-      console.log("🚀 ~ deletePlaylist ~ err:", err);
-      alert("Gagal hapus playlist");
-      if (err.response?.status === 401) {
-        localStorage.removeItem("access_token");
-        navigate("/login");
-      }
+      console.error("❌ Error deleting playlist:", err);
+      alert(err.response?.data?.message || "Gagal hapus playlist");
     }
   }
 
   async function deleteSongFromPlaylist(playlistId, musicId) {
     if (!confirm("Hapus lagu ini dari playlist?")) return;
-
-    const token = getToken();
-    if (!token) return;
-
     try {
-      await axios.delete(
-        `http://localhost:3001/api/playlists/${playlistId}/music/${musicId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      console.log("🔄 Deleting song from playlist:", playlistId, musicId);
+      await playlistsAPI.removeMusic(playlistId, musicId);
       fetchPlaylists();
-      // Update selected playlist
       if (selectedPlaylist) {
         const updatedPlaylist = {
           ...selectedPlaylist,
@@ -177,12 +107,8 @@ export default function Playlist() {
       }
       alert("✅ Lagu berhasil dihapus dari playlist!");
     } catch (err) {
-      console.error("❌ Gagal hapus lagu:", err);
-      alert("Gagal hapus lagu dari playlist");
-      if (err.response?.status === 401) {
-        localStorage.removeItem("access_token");
-        navigate("/login");
-      }
+      console.error("❌ Error deleting song:", err);
+      alert(err.response?.data?.message || "Gagal hapus lagu dari playlist");
     }
   }
 
@@ -193,8 +119,7 @@ export default function Playlist() {
 
   useEffect(() => {
     fetchPlaylists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchPlaylists]);
 
   return (
     <div className="home-container">

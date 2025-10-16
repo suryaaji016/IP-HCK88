@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import authAPI from "../api/auth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -12,7 +12,7 @@ export default function Register() {
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.post("http://localhost:3001/register", { email, password });
+      await authAPI.register({ email, password });
       alert("Registrasi berhasil! Silakan login.");
       navigate("/login");
     } catch (err) {
@@ -24,44 +24,43 @@ export default function Register() {
 
   return (
     <div className="auth-container">
-      <div className="navbar-logo" style={{ marginBottom: "2rem" }}>
+      <div className="auth-logo">
         <span className="navbar-logo-icon">🎵</span>
         <span>MusicApp</span>
       </div>
-      <h1 className="home-title" style={{ marginBottom: "1rem" }}>
-        📝 Register
-      </h1>
-      <p
-        style={{
-          color: "var(--text-gray)",
-          marginBottom: "2rem",
-          textAlign: "center",
-        }}
-      >
-        Daftar untuk mulai menggunakan MusicApp
+
+      <h1 className="auth-title">Create Account</h1>
+      <p className="auth-subtitle">
+        Daftar untuk mulai menggunakan MusicApp dan nikmati fitur menarik!
       </p>
+
       <form onSubmit={handleRegister} className="auth-form">
         <input
           type="email"
-          placeholder="📧 Email"
+          placeholder="📧 Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="🔒 Password"
+          placeholder="🔒 Password (min. 5 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          minLength={5}
         />
-        <button type="submit" disabled={loading}>
-          {loading ? "⏳ Loading..." : "🎵 Register"}
+        <button type="submit" disabled={loading} className="auth-submit-btn">
+          {loading ? "⏳ Creating Account..." : "🎵 Register Now"}
         </button>
-        <p>
-          Sudah punya akun? <Link to="/login">Login Sekarang</Link>
-        </p>
       </form>
+
+      <p className="auth-footer">
+        Sudah punya akun?{" "}
+        <Link to="/login" className="auth-link">
+          Login Sekarang
+        </Link>
+      </p>
     </div>
   );
 }

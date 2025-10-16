@@ -1,49 +1,50 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLoading,
+  appendTracks,
+  setTracksError,
+} from "../store/slices/tracksSlice";
+import tracksAPI from "../api/tracks";
+import TrackGrid from "../components/TrackGrid";
+import AIMoodAnalyzer from "../components/AIMoodAnalyzer";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function Home() {
-  const navigate = useNavigate();
-
-  const [tracks, setTracks] = useState([]);
-  const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
+  const dispatch = useDispatch();
+  const { tracks, loading, hasMore, offset } = useSelector(
+    (state) => state.tracks
+  );
   const [aiData, setAiData] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [mood, setMood] = useState("");
 
-  async function fetchSongs(newOffset = 0) {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      const { data } = await axios.get(
-        `http://localhost:3001/api/home?offset=${newOffset}&limit=12`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (newOffset === 0) {
-        setTracks(data.tracks);
-      } else {
-        setTracks((prev) => [...prev, ...data.tracks]);
+  const fetchSongs = useCallback(
+    async (newOffset = 0) => {
+      if (loading || !hasMore) return;
+      dispatch(setLoading(true));
+      try {
+        const data = await tracksAPI.getHome(newOffset, 12);
+        dispatch(
+          appendTracks({
+            tracks: data.tracks,
+            nextOffset: data.nextOffset,
+            hasMore: data.hasMore,
+          })
+        );
+      } catch (err) {
+        dispatch(setTracksError(err.message));
+        console.error("⚠️ Gagal ambil lagu:", err.message);
+      } finally {
+        dispatch(setLoading(false));
       }
-      setOffset(data.nextOffset);
-      setHasMore(data.hasMore);
-    } catch (err) {
-      console.error("⚠️ Gagal ambil lagu:", err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+    [loading, hasMore, dispatch]
+  );
 
   useEffect(() => {
-    fetchSongs(0);
-  }, []);
+    if (tracks.length === 0) {
+      fetchSongs();
+    }
+  }, [fetchSongs, tracks.length]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,103 +59,37 @@ export default function Home() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [offset, loading, hasMore]);
+  }, [offset, loading, hasMore, fetchSongs]);
 
-  async function generateAIPlaylist() {
-    if (!mood.trim()) return alert("Tulis suasana hati kamu dulu ya");
-    setAiLoading(true);
-    setAiData(null);
+  const handleGeneratePlaylist = async (mood) => {
     try {
-      const token = localStorage.getItem("access_token");
-      const { data } = await axios.post(
-        "http://localhost:3001/api/generate-ai",
-        { prompt: mood },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const data = await tracksAPI.generateAI(mood);
+      console.log("✅ Hasil AI:", data);
       setAiData(data);
-    } catch (err) {
-      console.error("Gagal generate playlist:", err);
-      alert("AI gagal menebak mood kamu, coba lagi ya!");
-    } finally {
-      setAiLoading(false);
+    } catch (error) {
+      console.error("❌ Gagal generate AI:", error);
     }
-  }
-
-  function TrackCard({ track }) {
-    return (
-      <div className="track-card" key={track.id}>
-        <img src={track.image} alt={track.name} className="track-image" />
-        <h4 className="track-name">{track.name}</h4>
-        <p className="track-artist">{track.artist}</p>
-        <button
-          onClick={() => navigate(`/detail/${track.id}`)}
-          className="track-button"
-        >
-          Detail
-        </button>
-      </div>
-    );
-  }
+  };
 
   return (
     <div className="home-container">
       <h1 className="home-title">🎵 Music Recommender</h1>
 
-      <section className="ai-section">
-        <div className="ai-header">
-          <h2 className="ai-title">🤖 AI Mood Analyzer</h2>
-          <p className="ai-description">
-            Tulis suasana hati kamu, lalu biarkan AI memilih lagu yang cocok
-            untukmu!
+      <AIMoodAnalyzer onResultsGenerated={handleGeneratePlaylist} />
+
+      {aiData && (
+        <div className="ai-results">
+          <p className="ai-results-subtitle">
+            Lagu terbaik untuk suasana hati kamu
           </p>
+          <TrackGrid tracks={aiData.tracks} />
         </div>
-
-        <div className="ai-input-group">
-          <input
-            type="text"
-            placeholder="contoh: galau malam hujan 🌧️"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-            className="ai-input"
-          />
-          <button
-            onClick={generateAIPlaylist}
-            disabled={aiLoading}
-            className="ai-button"
-          >
-            {aiLoading ? "⏳ Analisis..." : "Generate 🎶"}
-          </button>
-        </div>
-
-        {aiData && (
-          <div className="ai-results">
-            <h3 className="ai-results-header">
-              ✨ Mood: {aiData.mood} | Genre: {aiData.genre}
-            </h3>
-            <p className="ai-results-subtitle">
-              🎧 5 Lagu terbaik untuk suasana hati kamu
-            </p>
-            <div className="track-grid">
-              {aiData.tracks.map((track) => (
-                <TrackCard key={track.id} track={track} />
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+      )}
 
       <h2 className="section-title">🎸 Discover Music</h2>
-      <div className="track-grid">
-        {tracks.map((track, index) => (
-          <TrackCard key={`${track.id}-${index}`} track={track} />
-        ))}
-      </div>
+      <TrackGrid tracks={tracks} />
 
-      {loading && <p className="loading-message">⏳ Memuat lagu...</p>}
+      {loading && <LoadingSpinner message="Memuat lagu..." />}
       {!hasMore && <p className="status-message">✅ Semua lagu telah dimuat</p>}
     </div>
   );

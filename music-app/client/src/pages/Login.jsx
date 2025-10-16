@@ -1,30 +1,36 @@
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setToken } from "../store/slices/authSlice";
+import authAPI from "../api/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function handleLogin(e) {
     e.preventDefault();
     try {
       setLoading(true);
-      const { data } = await axios.post("http://localhost:3001/login", {
-        email,
-        password,
-      });
-      localStorage.setItem("access_token", data.access_token);
-      console.log(
-        "🔑 Token setelah login:",
-        localStorage.getItem("access_token")
-      );
+      console.log("🔄 Attempting login with email:", email);
 
+      const data = await authAPI.login({ email, password });
+      console.log("✅ Login successful, token received");
+
+      localStorage.setItem("access_token", data.access_token);
+      dispatch(setToken(data.access_token));
+
+      console.log("✅ Token saved, navigating to home");
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Login gagal");
+      console.error("❌ Login error:", err);
+      console.error("❌ Error response:", err.response?.data);
+      alert(
+        err.response?.data?.message || "Login gagal. Cek email dan password."
+      );
     } finally {
       setLoading(false);
     }
@@ -32,29 +38,29 @@ export default function Login() {
 
   const handleCredentialResponse = useCallback(
     async (response) => {
-      console.log(
-        "✅ Google credential:",
-        response.credential.slice(0, 30) + "..."
-      );
       try {
-        const { data } = await axios.post(
-          "http://localhost:3001/login/google",
-          {
-            id_token: response.credential,
-          }
-        );
+        console.log("🔄 Attempting Google login");
+
+        const data = await authAPI.googleLogin({
+          id_token: response.credential,
+        });
+
+        console.log("✅ Google login successful");
         localStorage.setItem("access_token", data.access_token);
+        dispatch(setToken(data.access_token));
+
+        console.log("✅ Token saved, navigating to home");
         navigate("/");
       } catch (err) {
-        console.error("Google login error:", err);
+        console.error("❌ Google login error:", err);
+        console.error("❌ Error response:", err.response?.data);
         alert(err.response?.data?.message || "Login Google gagal");
       }
     },
-    [navigate]
+    [navigate, dispatch]
   );
 
   useEffect(() => {
-    // Load Google Sign-In
     const initializeGoogleSignIn = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
@@ -71,11 +77,9 @@ export default function Login() {
       }
     };
 
-    // Check if google is already loaded
     if (window.google) {
       initializeGoogleSignIn();
     } else {
-      // Wait for google script to load
       const checkGoogle = setInterval(() => {
         if (window.google) {
           initializeGoogleSignIn();
