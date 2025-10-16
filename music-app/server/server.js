@@ -11,6 +11,9 @@ const playlistsRoutes = require("./routes/playlistsRoutes");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -33,12 +36,5 @@ app.use((err, req, res, next) => {
   console.error("❌ Server error:", err);
   res.status(500).json({ message: "Internal server error" });
 });
-
-// Only start server if not in test environment
-if (process.env.NODE_ENV !== "test") {
-  app.listen(PORT, () =>
-    console.log(`🚀 Server running at http://localhost:${PORT}`)
-  );
-}
 
 module.exports = app;
