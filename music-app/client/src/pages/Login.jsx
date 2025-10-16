@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router";
 import { useDispatch } from "react-redux";
 import { setToken } from "../store/slices/authSlice";
 import authAPI from "../api/auth";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -28,9 +29,16 @@ export default function Login() {
     } catch (err) {
       console.error("❌ Login error:", err);
       console.error("❌ Error response:", err.response?.data);
-      alert(
-        err.response?.data?.message || "Login gagal. Cek email dan password."
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Login Gagal",
+        text:
+          err.response?.data?.message || "Login gagal. Cek email dan password.",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } finally {
       setLoading(false);
     }
@@ -54,7 +62,15 @@ export default function Login() {
       } catch (err) {
         console.error("❌ Google login error:", err);
         console.error("❌ Error response:", err.response?.data);
-        alert(err.response?.data?.message || "Login Google gagal");
+        Swal.fire({
+          icon: "error",
+          title: "Login Google Gagal",
+          text: err.response?.data?.message || "Login Google gagal",
+          background: "#121212",
+          color: "#fff",
+          confirmButtonColor: "#1db954",
+          confirmButtonText: "OK",
+        });
       }
     },
     [navigate, dispatch]
@@ -95,8 +111,10 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-logo">
-        <span className="navbar-logo-icon">🎵</span>
-        <span>MusicApp</span>
+        <span className="navbar-logo-icon">
+          <img src="/logo.png" alt="Logo" />
+        </span>
+        <span>Spotipy</span>
       </div>
 
       <h1 className="auth-title">Welcome Back!</h1>
@@ -111,14 +129,12 @@ export default function Login() {
           placeholder="📧 Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
         <input
           type="password"
           placeholder="🔒 Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
         <button type="submit" disabled={loading} className="auth-submit-btn">
           {loading ? "⏳ Loading..." : "🎵 Login"}

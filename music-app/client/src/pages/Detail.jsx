@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentTrack } from "../store/slices/tracksSlice";
 import { setPlaylists } from "../store/slices/playlistsSlice";
@@ -7,6 +7,7 @@ import tracksAPI from "../api/tracks";
 import playlistsAPI from "../api/playlists";
 import Modal from "../components/Modal";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Swal from "sweetalert2";
 
 export default function Detail() {
   const { id } = useParams();
@@ -41,12 +42,28 @@ export default function Detail() {
 
   async function addToPlaylist() {
     if (!selectedPlaylist) {
-      alert("Pilih playlist terlebih dahulu!");
+      Swal.fire({
+        icon: "warning",
+        title: "Pilih Playlist Dulu",
+        text: "Silakan pilih playlist sebelum menambahkan lagu.",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
     if (!track) {
-      alert("Track data tidak tersedia!");
+      Swal.fire({
+        icon: "error",
+        title: "Track Tidak Tersedia",
+        text: "Data track tidak ditemukan!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
@@ -81,7 +98,14 @@ export default function Detail() {
       });
 
       console.log("✅ Response from server:", response);
-      alert("✅ Lagu berhasil ditambahkan ke playlist!");
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Lagu berhasil ditambahkan ke playlist!",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
       setShowPlaylistModal(false);
       setSelectedPlaylist("");
     } catch (err) {
@@ -93,7 +117,16 @@ export default function Detail() {
         err.response?.data?.message ||
         err.message ||
         "Gagal menambahkan ke playlist";
-      alert(`❌ ${errorMessage}`);
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Menambahkan",
+        text: errorMessage,
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } finally {
       setAddingToPlaylist(false);
     }
@@ -124,7 +157,15 @@ export default function Detail() {
             if (track.spotify_url) {
               window.open(track.spotify_url, "_blank", "noopener,noreferrer");
             } else {
-              alert("Link Spotify tidak tersedia untuk lagu ini.");
+              Swal.fire({
+                icon: "warning",
+                title: "Link Tidak Tersedia",
+                text: "Link Spotify tidak tersedia untuk lagu ini.",
+                background: "#121212",
+                color: "#fff",
+                confirmButtonColor: "#1db954",
+                confirmButtonText: "OK",
+              });
             }
           }}
           className="detail-play-button"

@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { setPlaylists } from "../store/slices/playlistsSlice";
 import playlistsAPI from "../api/playlists";
 import PlaylistCard from "../components/PlaylistCard";
 import Modal from "../components/Modal";
+import Swal from "sweetalert2";
 
 export default function Playlist() {
   const navigate = useNavigate();
@@ -32,7 +33,15 @@ export default function Playlist() {
 
   async function createPlaylist() {
     if (!newName.trim()) {
-      alert("⚠️ Nama playlist tidak boleh kosong!");
+      Swal.fire({
+        icon: "warning",
+        title: "Empty Name",
+        text: "Nama playlist tidak boleh kosong!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
       return;
     }
     try {
@@ -40,16 +49,40 @@ export default function Playlist() {
       await playlistsAPI.create({ name: newName });
       setNewName("");
       fetchPlaylists();
-      alert("✅ Playlist berhasil dibuat!");
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Playlist berhasil dibuat!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } catch (err) {
       console.error("❌ Error creating playlist:", err);
-      alert(err.response?.data?.message || "Gagal buat playlist");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Create",
+        text: err.response?.data?.message || "Gagal buat playlist",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     }
   }
 
   async function updatePlaylist() {
     if (!editName.trim()) {
-      alert("Nama playlist tidak boleh kosong!");
+      Swal.fire({
+        icon: "warning",
+        title: "Empty Name",
+        text: "Nama playlist tidak boleh kosong!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
       return;
     }
     try {
@@ -59,10 +92,26 @@ export default function Playlist() {
       setEditingPlaylist(null);
       setEditName("");
       fetchPlaylists();
-      alert("✅ Playlist berhasil diupdate!");
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Playlist berhasil diupdate!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } catch (err) {
       console.error("❌ Error updating playlist:", err);
-      alert(err.response?.data?.message || "Gagal update playlist");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Update",
+        text: err.response?.data?.message || "Gagal update playlist",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     }
   }
 
@@ -74,7 +123,21 @@ export default function Playlist() {
   }
 
   async function deletePlaylist(id) {
-    if (!confirm("Hapus playlist ini?")) return;
+    const result = await Swal.fire({
+      title: "Delete Playlist?",
+      text: "Hapus playlist ini? Tindakan ini tidak dapat dibatalkan.",
+      icon: "warning",
+      showCancelButton: true,
+      background: "#121212",
+      color: "#fff",
+      confirmButtonColor: "#1db954",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       console.log("🔄 Deleting playlist:", id);
       await playlistsAPI.delete(id);
@@ -83,15 +146,45 @@ export default function Playlist() {
         setShowDetailModal(false);
         setSelectedPlaylist(null);
       }
-      alert("✅ Playlist berhasil dihapus!");
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Playlist berhasil dihapus!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } catch (err) {
       console.error("❌ Error deleting playlist:", err);
-      alert(err.response?.data?.message || "Gagal hapus playlist");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Delete",
+        text: err.response?.data?.message || "Gagal hapus playlist",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     }
   }
 
   async function deleteSongFromPlaylist(playlistId, musicId) {
-    if (!confirm("Hapus lagu ini dari playlist?")) return;
+    const result = await Swal.fire({
+      title: "Remove Song?",
+      text: "Hapus lagu ini dari playlist?",
+      icon: "warning",
+      showCancelButton: true,
+      background: "#121212",
+      color: "#fff",
+      confirmButtonColor: "#1db954",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Remove",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       console.log("🔄 Deleting song from playlist:", playlistId, musicId);
       await playlistsAPI.removeMusic(playlistId, musicId);
@@ -105,10 +198,26 @@ export default function Playlist() {
         };
         setSelectedPlaylist(updatedPlaylist);
       }
-      alert("✅ Lagu berhasil dihapus dari playlist!");
+      Swal.fire({
+        icon: "success",
+        title: "Removed!",
+        text: "Lagu berhasil dihapus dari playlist!",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } catch (err) {
       console.error("❌ Error deleting song:", err);
-      alert(err.response?.data?.message || "Gagal hapus lagu dari playlist");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Remove",
+        text: err.response?.data?.message || "Gagal hapus lagu dari playlist",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     }
   }
 

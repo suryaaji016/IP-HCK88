@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function TrackCard({ track }) {
   const navigate = useNavigate();
@@ -16,9 +16,6 @@ export default function TrackCard({ track }) {
           alt={track.name}
           className="track-image"
         />
-        <div className="track-play-overlay">
-          <span className="track-play-icon">▶</span>
-        </div>
       </div>
       <div className="track-info">
         <h3 className="track-name" title={track.name}>

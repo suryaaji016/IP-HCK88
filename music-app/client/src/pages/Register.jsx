@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router";
 import authAPI from "../api/auth";
+import Swal from "sweetalert2";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -13,10 +14,27 @@ export default function Register() {
     try {
       setLoading(true);
       await authAPI.register({ email, password });
-      alert("Registrasi berhasil! Silakan login.");
-      navigate("/login");
+      Swal.fire({
+        icon: "success",
+        title: "Registrasi Berhasil!",
+        text: "Silakan login untuk melanjutkan.",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "Login Sekarang",
+      }).then(() => {
+        navigate("/login");
+      });
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal register");
+      Swal.fire({
+        icon: "error",
+        title: "Registrasi Gagal",
+        text: err.response?.data?.message || "Gagal register",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#1db954",
+        confirmButtonText: "OK",
+      });
     } finally {
       setLoading(false);
     }
@@ -25,8 +43,10 @@ export default function Register() {
   return (
     <div className="auth-container">
       <div className="auth-logo">
-        <span className="navbar-logo-icon">🎵</span>
-        <span>MusicApp</span>
+        <span className="navbar-logo-icon">
+          <img src="/logo.png" alt="Logo" />
+        </span>
+        <span>Spotipy</span>
       </div>
 
       <h1 className="auth-title">Create Account</h1>
@@ -40,14 +60,12 @@ export default function Register() {
           placeholder="📧 Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
         <input
           type="password"
           placeholder="🔒 Password (min. 5 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
           minLength={5}
         />
         <button type="submit" disabled={loading} className="auth-submit-btn">

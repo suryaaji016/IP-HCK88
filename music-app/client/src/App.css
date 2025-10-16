@@ -1,8 +1,3 @@
-/* ========================================
-   🎵 SPOTIFY-LIKE MUSIC APP STYLING
-   ======================================== */
-
-/* === ROOT VARIABLES === */
 :root {
   --spotify-green: #1db954;
   --spotify-black: #191414;
@@ -16,7 +11,6 @@
   --transition: all 0.3s ease;
 }
 
-/* === GLOBAL RESET === */
 * {
   margin: 0;
   padding: 0;
@@ -32,9 +26,6 @@ body {
   line-height: 1.6;
 }
 
-/* ========================================
-   🧭 NAVBAR STYLING
-   ======================================== */
 .navbar {
   background: var(--spotify-black);
   padding: 1rem 2rem;
@@ -59,7 +50,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  color: var(--text-white);
+  color: var(--spotify-green);
   font-size: 1.5rem;
   font-weight: 700;
   transition: var(--transition);
@@ -67,7 +58,7 @@ body {
 }
 
 .navbar-logo:hover {
-  color: var(--spotify-green);
+  color: #1ed760;
   transform: scale(1.05);
 }
 
@@ -75,23 +66,21 @@ body {
   font-size: 2rem;
 }
 
-/* Logo image size control */
 .navbar-logo img {
-  width: 42px; /* 🔧 Ubah sesuai selera: 32–48px ideal */
-  height: 42px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 0 8px rgba(29, 185, 84, 0.6));
 }
 
-/* Versi responsif agar tetap proporsional di HP */
 @media (max-width: 768px) {
   .navbar-logo img {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
   }
 }
 
-/* Search Bar in Navbar */
 .navbar-search {
   flex: 1;
   max-width: 500px;
@@ -155,9 +144,6 @@ body {
   transform: scale(1.05);
 }
 
-/* ========================================
-   🔍 SEARCH BAR STYLING
-   ======================================== */
 .search-bar-container {
   position: relative;
   width: 100%;
@@ -226,7 +212,6 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Search Dropdown */
 .search-dropdown {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -386,9 +371,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* ========================================
-   🏠 HOME PAGE STYLING
-   ======================================== */
 .home-container {
   padding: 2rem;
   max-width: 1400px;
@@ -406,9 +388,6 @@ body {
   background-clip: text;
 }
 
-/* ========================================
-   🤖 AI MOOD ANALYZER SECTION
-   ======================================== */
 .ai-section {
   background: linear-gradient(135deg, var(--spotify-gray) 0%, #1f1f1f 100%);
   border-radius: 16px;
@@ -506,9 +485,6 @@ body {
   margin-bottom: 1.5rem;
 }
 
-/* ========================================
-   🎵 TRACK GRID & CARDS
-   ======================================== */
 .section-title {
   font-size: 2rem;
   font-weight: 700;
@@ -601,9 +577,6 @@ body {
   transform: scale(1.05);
 }
 
-/* ========================================
-   📄 DETAIL PAGE STYLING - GLASSMORPHISM
-   ======================================== */
 .detail-container {
   padding: 3rem 2rem;
   max-width: 800px;
@@ -771,9 +744,6 @@ body {
   transform: none;
 }
 
-/* ========================================
-   🎭 MODAL STYLING - GLASSMORPHISM MODERN
-   ======================================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1020,9 +990,6 @@ body {
   transform: none;
 }
 
-/* ========================================
-   🎵 PLAYLIST DETAIL MODAL
-   ======================================== */
 .playlist-detail-modal {
   max-width: 700px;
   max-height: 80vh;
@@ -1121,9 +1088,6 @@ body {
   transform: scale(1.1);
 }
 
-/* ========================================
-   ⏳ LOADING & STATUS MESSAGES
-   ======================================== */
 .loading-message,
 .status-message {
   text-align: center;
@@ -1136,9 +1100,6 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* ========================================
-   🎨 ANIMATIONS
-   ======================================== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1171,9 +1132,6 @@ body {
   }
 }
 
-/* ========================================
-   📱 RESPONSIVE DESIGN
-   ======================================== */
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem;
@@ -1274,9 +1232,6 @@ body {
   }
 }
 
-/* ========================================
-   🔐 AUTH PAGES (LOGIN & REGISTER) - MODERN GLASSMORPHISM
-   ======================================== */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -1286,7 +1241,6 @@ body {
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  /* Animated Gradient Background */
   background: linear-gradient(
     135deg,
     #1a1a1a 0%,
@@ -1299,7 +1253,6 @@ body {
   animation: gradientShift 15s ease infinite;
 }
 
-/* Animated gradient keyframes */
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
@@ -1311,8 +1264,6 @@ body {
     background-position: 0% 50%;
   }
 }
-
-/* Floating circles background effect */
 .auth-container::before,
 .auth-container::after {
   content: "";
@@ -1351,13 +1302,12 @@ body {
   }
 }
 
-/* Logo styling */
 .auth-logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   margin-bottom: 2rem;
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 900;
   color: var(--text-white);
   z-index: 1;
@@ -1366,11 +1316,17 @@ body {
 }
 
 .auth-logo .navbar-logo-icon {
-  font-size: 2.5rem;
+  font-size: 4rem;
   filter: drop-shadow(0 0 20px rgba(29, 185, 84, 0.6));
 }
 
-/* Title and subtitle */
+.auth-logo img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+}
+
 .auth-title {
   font-size: 2.5rem;
   font-weight: 900;
@@ -1393,7 +1349,6 @@ body {
   position: relative;
 }
 
-/* Glassmorphism Form Container */
 .auth-form {
   background: rgba(24, 24, 24, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
@@ -1421,7 +1376,6 @@ body {
   }
 }
 
-/* Input fields with modern styling */
 .auth-form input {
   width: 100%;
   padding: 1.1rem 1.5rem;
@@ -1450,7 +1404,6 @@ body {
   font-weight: 400;
 }
 
-/* Submit button with gradient and hover effect */
 .auth-submit-btn {
   width: 100%;
   padding: 1.1rem;
@@ -1506,7 +1459,6 @@ body {
   transform: none;
 }
 
-/* Divider styling */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -1533,7 +1485,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Google Sign-In button container */
 #googleSignIn {
   display: flex;
   justify-content: center;
@@ -1548,7 +1499,6 @@ body {
   border-radius: 16px !important;
 }
 
-/* Footer text styling */
 .auth-footer {
   text-align: center;
   color: var(--text-gray);
@@ -1585,7 +1535,6 @@ body {
   width: 100%;
 }
 
-/* Form paragraph styling */
 .auth-form p {
   text-align: center;
   color: var(--text-gray);
@@ -1614,9 +1563,6 @@ body {
   }
 }
 
-/* ========================================
-   🎶 PLAYLIST PAGE STYLING
-   ======================================== */
 .playlist-header {
   display: flex;
   justify-content: space-between;
@@ -1759,9 +1705,6 @@ body {
   background: var(--hover-gray);
 }
 
-/* ========================================
-   🎵 ADDITIONAL UTILITY CLASSES
-   ======================================== */
 .btn-secondary {
   background: var(--spotify-gray) !important;
   color: var(--text-white) !important;
@@ -1807,4 +1750,174 @@ body {
   border-radius: 8px;
   margin-bottom: 1rem;
   text-align: center;
+}
+
+/* ============================================
+   SweetAlert2 Custom Styling - Spotify Theme
+   ============================================ */
+
+/* Modal Container */
+.swal2-popup {
+  background: #181818 !important;
+  border: 1px solid rgba(29, 185, 84, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  padding: 2rem !important;
+}
+
+/* Title */
+.swal2-title {
+  color: #fff !important;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Content Text */
+.swal2-html-container {
+  color: #b3b3b3 !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Success Icon */
+.swal2-success {
+  border-color: #1db954 !important;
+}
+
+.swal2-success-ring {
+  border-color: rgba(29, 185, 84, 0.3) !important;
+}
+
+.swal2-success-line-tip,
+.swal2-success-line-long {
+  background-color: #1db954 !important;
+}
+
+/* Error Icon */
+.swal2-error {
+  border-color: #e22134 !important;
+}
+
+.swal2-x-mark-line-left,
+.swal2-x-mark-line-right {
+  background-color: #e22134 !important;
+}
+
+/* Warning Icon */
+.swal2-warning {
+  border-color: #f5a623 !important;
+  color: #f5a623 !important;
+}
+
+/* Confirm Button */
+.swal2-confirm {
+  background: #1db954 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4) !important;
+}
+
+.swal2-confirm:hover {
+  background: #1ed760 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 16px rgba(29, 185, 84, 0.6) !important;
+}
+
+.swal2-confirm:focus {
+  box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.4) !important;
+}
+
+/* Cancel Button */
+.swal2-cancel {
+  background: #282828 !important;
+  color: #fff !important;
+  border: 1px solid #404040 !important;
+  border-radius: 25px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-cancel:hover {
+  background: #3e3e3e !important;
+  border-color: #535353 !important;
+  transform: scale(1.05) !important;
+}
+
+/* Toast Notification (top-end) */
+.swal2-toast {
+  background: #181818 !important;
+  border: 1px solid rgba(29, 185, 84, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.swal2-toast .swal2-title {
+  color: #fff !important;
+  font-size: 1rem !important;
+}
+
+/* Close Button */
+.swal2-close {
+  color: #b3b3b3 !important;
+  font-size: 2rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-close:hover {
+  color: #fff !important;
+  transform: scale(1.1) !important;
+}
+
+/* Actions Container */
+.swal2-actions {
+  margin-top: 1.5rem !important;
+  gap: 1rem !important;
+}
+
+/* Loading Spinner */
+.swal2-loader {
+  border-color: #1db954 transparent #1db954 transparent !important;
+}
+
+/* Backdrop/Overlay */
+.swal2-container {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Icon Container */
+.swal2-icon {
+  margin: 1.5rem auto !important;
+  border-width: 3px !important;
+}
+
+/* Validation Message */
+.swal2-validation-message {
+  background: #282828 !important;
+  color: #ff2d3f !important;
+  border: 1px solid #e22134 !important;
+}
+
+/* Timer Progress Bar */
+.swal2-timer-progress-bar {
+  background: #1db954 !important;
+  height: 4px !important;
+}
+
+/* Popup Show Animation */
+.swal2-show {
+  animation: swal2-show 0.3s !important;
+}
+
+/* Popup Hide Animation */
+.swal2-hide {
+  animation: swal2-hide 0.2s !important;
 }

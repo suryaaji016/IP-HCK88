@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import { logout } from "../store/slices/authSlice";
 import SearchBar from "./SearchBar";
@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar";
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   function handleLogout() {
     dispatch(logout());
@@ -29,12 +30,22 @@ export default function Navbar() {
 
         <ul className="navbar-links">
           <li>
-            <Link to="/" className="navbar-link active">
+            <Link
+              to="/"
+              className={`navbar-link ${
+                location.pathname === "/" ? "active" : ""
+              }`}
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link to="/playlist" className="navbar-link">
+            <Link
+              to="/playlist"
+              className={`navbar-link ${
+                location.pathname === "/playlist" ? "active" : ""
+              }`}
+            >
               My Playlist
             </Link>
           </li>
