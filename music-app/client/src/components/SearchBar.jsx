@@ -82,7 +82,7 @@ export default function SearchBar() {
     <div className="search-bar-container">
       <div className="search-bar">
         <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"></span>
           <input
             type="text"
             placeholder="Search for songs or artists..."

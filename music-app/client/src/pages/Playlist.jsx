@@ -45,7 +45,7 @@ export default function Playlist() {
       return;
     }
     try {
-      console.log("🔄 Creating playlist:", newName);
+      console.log("Creating playlist:", newName);
       await playlistsAPI.create({ name: newName });
       setNewName("");
       fetchPlaylists();
@@ -86,7 +86,7 @@ export default function Playlist() {
       return;
     }
     try {
-      console.log("🔄 Updating playlist:", editingPlaylist.id, editName);
+      console.log("Updating playlist:", editingPlaylist.id, editName);
       await playlistsAPI.update(editingPlaylist.id, { name: editName });
       setShowEditModal(false);
       setEditingPlaylist(null);
@@ -139,7 +139,7 @@ export default function Playlist() {
     if (!result.isConfirmed) return;
 
     try {
-      console.log("🔄 Deleting playlist:", id);
+      console.log("Deleting playlist:", id);
       await playlistsAPI.delete(id);
       fetchPlaylists();
       if (selectedPlaylist?.id === id) {
@@ -186,7 +186,7 @@ export default function Playlist() {
     if (!result.isConfirmed) return;
 
     try {
-      console.log("🔄 Deleting song from playlist:", playlistId, musicId);
+      console.log("Deleting song from playlist:", playlistId, musicId);
       await playlistsAPI.removeMusic(playlistId, musicId);
       fetchPlaylists();
       if (selectedPlaylist) {
@@ -232,24 +232,24 @@ export default function Playlist() {
 
   return (
     <div className="home-container">
-      <h1 className="home-title">🎶 My Playlists</h1>
+      <h1 className="home-title">My Playlists</h1>
 
       {/* Create Playlist Section */}
       <div className="playlist-create-section">
         <h3 style={{ marginBottom: "1rem", fontSize: "1.25rem" }}>
-          ➕ Create New Playlist
+          + Create New Playlist
         </h3>
         <div className="ai-input-group">
           <input
             type="text"
-            placeholder="Nama playlist baru... 🎵"
+            placeholder="Nama playlist baru..."
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             className="ai-input"
             onKeyPress={(e) => e.key === "Enter" && createPlaylist()}
           />
           <button onClick={createPlaylist} className="ai-button">
-            ➕ Add Playlist
+            + Add Playlist
           </button>
         </div>
       </div>
