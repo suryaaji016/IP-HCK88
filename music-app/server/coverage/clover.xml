@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1760586718709" clover="3.2.0">
-  <project timestamp="1760586718709" name="All files">
-    <metrics statements="229" coveredstatements="212" conditionals="78" coveredconditionals="70" methods="27" coveredmethods="27" elements="334" coveredelements="309" complexity="0" loc="229" ncloc="229" packages="5" files="12" classes="12"/>
+<coverage generated="1760672783028" clover="3.2.0">
+  <project timestamp="1760672783028" name="All files">
+    <metrics statements="228" coveredstatements="211" conditionals="76" coveredconditionals="69" methods="26" coveredmethods="26" elements="330" coveredelements="306" complexity="0" loc="228" ncloc="228" packages="5" files="12" classes="12"/>
     <package name="controllers">
-      <metrics statements="135" coveredstatements="120" conditionals="54" coveredconditionals="52" methods="11" coveredmethods="11"/>
+      <metrics statements="135" coveredstatements="120" conditionals="54" coveredconditionals="53" methods="11" coveredmethods="11"/>
       <file name="authController.js" path="C:\Users\asus\Documents\ip\IP-HCK88\music-app\server\controllers\authController.js">
         <metrics statements="57" coveredstatements="54" conditionals="24" coveredconditionals="23" methods="4" coveredmethods="4"/>
         <line num="1" count="5" type="stmt"/>
@@ -65,7 +65,7 @@
         <line num="131" count="37" type="cond" truecount="2" falsecount="0"/>
       </file>
       <file name="playlistsController.js" path="C:\Users\asus\Documents\ip\IP-HCK88\music-app\server\controllers\playlistsController.js">
-        <metrics statements="78" coveredstatements="66" conditionals="30" coveredconditionals="29" methods="7" coveredmethods="7"/>
+        <metrics statements="78" coveredstatements="66" conditionals="30" coveredconditionals="30" methods="7" coveredmethods="7"/>
         <line num="1" count="5" type="stmt"/>
         <line num="5" count="4" type="stmt"/>
         <line num="6" count="4" type="stmt"/>
@@ -143,7 +143,7 @@
         <line num="181" count="0" type="stmt"/>
         <line num="182" count="0" type="stmt"/>
         <line num="187" count="5" type="stmt"/>
-        <line num="194" count="32" type="cond" truecount="1" falsecount="1"/>
+        <line num="194" count="32" type="cond" truecount="2" falsecount="0"/>
       </file>
     </package>
     <package name="helpers">
@@ -164,9 +164,9 @@
       </file>
     </package>
     <package name="middlewares">
-      <metrics statements="21" coveredstatements="20" conditionals="14" coveredconditionals="11" methods="2" coveredmethods="2"/>
+      <metrics statements="20" coveredstatements="19" conditionals="12" coveredconditionals="9" methods="1" coveredmethods="1"/>
       <file name="authentication.js" path="C:\Users\asus\Documents\ip\IP-HCK88\music-app\server\middlewares\authentication.js">
-        <metrics statements="21" coveredstatements="20" conditionals="14" coveredconditionals="11" methods="2" coveredmethods="2"/>
+        <metrics statements="20" coveredstatements="19" conditionals="12" coveredconditionals="9" methods="1" coveredmethods="1"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
         <line num="5" count="98" type="stmt"/>
@@ -187,7 +187,6 @@
         <line num="32" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="34" count="29" type="stmt"/>
         <line num="38" count="5" type="stmt"/>
-        <line num="45" count="420" type="cond" truecount="2" falsecount="0"/>
       </file>
     </package>
     <package name="models">
